@@ -1,5 +1,6 @@
-import 'package:file_picker/file_picker.dart';
+import 'package:file_selector/file_selector.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../core/theme/app_theme.dart';
@@ -62,15 +63,29 @@ class _HostFormDialogState extends State<HostFormDialog> {
   }
 
   Future<void> _pickKeyFile() async {
-    final result = await FilePicker.platform.pickFiles(
-      dialogTitle: 'Selecionar Arquivo de Chave SSH Privada',
-      type: FileType.any,
-    );
+    try {
+      final file = await openFile(confirmButtonText: 'Selecionar chave');
+      if (!mounted || file == null) return;
 
-    if (result != null && result.files.single.path != null) {
-      setState(() {
-        _keyPathController.text = result.files.single.path!;
-      });
+      _keyPathController.text = file.path;
+    } on PlatformException {
+      if (!mounted) return;
+
+      await showDialog<void>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Não foi possível abrir o seletor de arquivos'),
+          content: const Text(
+            'Você pode digitar o caminho da chave privada no formulário.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Fechar'),
+            ),
+          ],
+        ),
+      );
     }
   }
 

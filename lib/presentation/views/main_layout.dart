@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 
@@ -36,6 +37,12 @@ class _MainLayoutState extends State<MainLayout> {
   Widget build(BuildContext context) {
     final width = MediaQuery.sizeOf(context).width;
     final compact = width < 1200;
+    final vaultName = switch (defaultTargetPlatform) {
+      TargetPlatform.linux => 'GNOME Keyring / KWallet',
+      TargetPlatform.macOS => 'Chaves do macOS',
+      TargetPlatform.windows => 'Credenciais do Windows',
+      _ => 'Cofre do sistema',
+    };
 
     return SignalBuilder(
       builder: (context) {
@@ -101,9 +108,9 @@ class _MainLayoutState extends State<MainLayout> {
                     ),
 
                     if (compact)
-                      const Tooltip(
-                        message: 'Cofre Ativo · GNOME Keyring / KWallet',
-                        child: Padding(
+                      Tooltip(
+                        message: 'Cofre Ativo · $vaultName',
+                        child: const Padding(
                           padding: EdgeInsets.all(14),
                           child: Icon(
                             Icons.shield_outlined,
@@ -133,11 +140,11 @@ class _MainLayoutState extends State<MainLayout> {
                               ),
                             ),
                             const SizedBox(width: 10),
-                            const Expanded(
+                            Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(
+                                  const Text(
                                     'Cofre Ativo',
                                     style: TextStyle(
                                       fontSize: 12,
@@ -146,8 +153,8 @@ class _MainLayoutState extends State<MainLayout> {
                                     ),
                                   ),
                                   Text(
-                                    'GNOME Keyring / KWallet',
-                                    style: TextStyle(
+                                    vaultName,
+                                    style: const TextStyle(
                                       fontSize: 10,
                                       color: Color(0xFF94A3B8),
                                     ),

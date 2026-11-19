@@ -1,11 +1,18 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+
 import '../../core/errors/exceptions.dart';
 
 class SecureStorageDatasource {
   final FlutterSecureStorage _storage;
 
   SecureStorageDatasource({FlutterSecureStorage? storage})
-      : _storage = storage ?? const FlutterSecureStorage();
+    : _storage =
+          storage ??
+          const FlutterSecureStorage(
+            mOptions: MacOsOptions(
+              useDataProtectionKeyChain: false,
+            ),
+          );
 
   String _passwordKey(String hostId) => 'ssh_host_${hostId}_password';
   String _passphraseKey(String hostId) => 'ssh_host_${hostId}_passphrase';
@@ -38,7 +45,10 @@ class SecureStorageDatasource {
     try {
       await _storage.write(key: _passphraseKey(hostId), value: passphrase);
     } catch (e) {
-      throw StorageException('Falha ao salvar passphrase no cofre seguro: $e', e);
+      throw StorageException(
+        'Falha ao salvar passphrase no cofre seguro: $e',
+        e,
+      );
     }
   }
 
@@ -46,7 +56,10 @@ class SecureStorageDatasource {
     try {
       return await _storage.read(key: _passphraseKey(hostId));
     } catch (e) {
-      throw StorageException('Falha ao recuperar passphrase do cofre seguro: $e', e);
+      throw StorageException(
+        'Falha ao recuperar passphrase do cofre seguro: $e',
+        e,
+      );
     }
   }
 
@@ -54,7 +67,10 @@ class SecureStorageDatasource {
     try {
       await _storage.delete(key: _passphraseKey(hostId));
     } catch (e) {
-      throw StorageException('Falha ao deletar passphrase do cofre seguro: $e', e);
+      throw StorageException(
+        'Falha ao deletar passphrase do cofre seguro: $e',
+        e,
+      );
     }
   }
 
