@@ -10,6 +10,7 @@ class SecureStorageDatasource {
           storage ??
           const FlutterSecureStorage(
             mOptions: MacOsOptions(
+              accountName: 'com.servix.Servix',
               useDataProtectionKeyChain: false,
             ),
           );

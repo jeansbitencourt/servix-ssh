@@ -74,17 +74,6 @@ set_target_properties(${BINARY_NAME}
 # them to the application.
 include(flutter/generated_plugins.cmake)
 
-# Keep existing Linux credentials reachable after renaming the GTK application.
-if(TARGET flutter_secure_storage_linux_plugin)
-  get_target_property(SECURE_STORAGE_DIR flutter_secure_storage_linux_plugin SOURCE_DIR)
-  get_property(SECURE_STORAGE_DEFINITIONS DIRECTORY "${SECURE_STORAGE_DIR}"
-    PROPERTY COMPILE_DEFINITIONS)
-  list(FILTER SECURE_STORAGE_DEFINITIONS EXCLUDE REGEX "^APPLICATION_ID=")
-  list(APPEND SECURE_STORAGE_DEFINITIONS "APPLICATION_ID=\"com.controlpanel.control_panel\"")
-  set_property(DIRECTORY "${SECURE_STORAGE_DIR}" PROPERTY COMPILE_DEFINITIONS
-    "${SECURE_STORAGE_DEFINITIONS}")
-endif()
-
 # === Installation ===
 # By default, "installing" just makes a relocatable bundle in the build
 # directory.
