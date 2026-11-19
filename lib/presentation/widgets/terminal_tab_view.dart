@@ -1,17 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:xterm/xterm.dart';
+
 import '../../core/theme/app_theme.dart';
 import '../../core/theme/terminal_theme.dart';
 import '../../domain/entities/terminal_session.dart';
 
 class TerminalTabView extends StatefulWidget {
   final TerminalSession session;
+  final bool isActive;
   final VoidCallback onReconnect;
   final VoidCallback onClose;
 
   const TerminalTabView({
     super.key,
     required this.session,
+    required this.isActive,
     required this.onReconnect,
     required this.onClose,
   });
@@ -20,17 +23,27 @@ class TerminalTabView extends StatefulWidget {
   State<TerminalTabView> createState() => _TerminalTabViewState();
 }
 
+enum _TerminalAction { clear, reconnect, close }
+
 class _TerminalTabViewState extends State<TerminalTabView> {
-  double _fontSize = 14.0;
+  double _fontSize = AppTerminalTheme.textStyle.fontSize;
   final FocusNode _focusNode = FocusNode();
 
   @override
   void initState() {
     super.initState();
+    if (widget.isActive) _focusAfterLayout();
+  }
+
+  @override
+  void didUpdateWidget(covariant TerminalTabView oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.isActive && !oldWidget.isActive) _focusAfterLayout();
+  }
+
+  void _focusAfterLayout() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) {
-        _focusNode.requestFocus();
-      }
+      if (mounted && widget.isActive) _focusNode.requestFocus();
     });
   }
 
@@ -40,161 +53,179 @@ class _TerminalTabViewState extends State<TerminalTabView> {
     super.dispose();
   }
 
-  void _clearTerminal() {
-    widget.session.terminal.write('\x1b[2J\x1b[H');
+  void _adjustFontSize(double delta) {
+    setState(() => _fontSize += delta);
+    _focusNode.requestFocus();
+  }
+
+  void _runAction(_TerminalAction action) {
+    switch (action) {
+      case _TerminalAction.clear:
+        widget.session.terminal.write('\x1b[2J\x1b[H');
+        _focusAfterLayout();
+      case _TerminalAction.reconnect:
+        widget.onReconnect();
+      case _TerminalAction.close:
+        widget.onClose();
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    final status = widget.session.status;
     final host = widget.session.host;
+    final address = '${host.username}@${host.host}:${host.port}';
+    final (statusText, statusColor) = switch (widget.session.status) {
+      TerminalSessionStatus.connected => ('Conectado', AppTheme.success),
+      TerminalSessionStatus.connecting => ('Conectando…', AppTheme.warning),
+      TerminalSessionStatus.disconnected => (
+        'Desconectado',
+        const Color(0xFF94A3B8),
+      ),
+      TerminalSessionStatus.error => ('Erro', AppTheme.error),
+    };
 
-    Color statusColor;
-    String statusText;
-
-    switch (status) {
-      case TerminalSessionStatus.connected:
-        statusColor = AppTheme.success;
-        statusText = 'Conectado';
-        break;
-      case TerminalSessionStatus.connecting:
-        statusColor = AppTheme.warning;
-        statusText = 'Conectando...';
-        break;
-      case TerminalSessionStatus.disconnected:
-        statusColor = const Color(0xFF94A3B8);
-        statusText = 'Desconectado';
-        break;
-      case TerminalSessionStatus.error:
-        statusColor = AppTheme.error;
-        statusText = 'Erro';
-        break;
-    }
-
-    return Container(
-      color: const Color(0xFF0A0E17),
-      child: Column(
-        children: [
-          // Terminal Toolbar
-          Container(
-            height: 44,
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            decoration: const BoxDecoration(
-              color: AppTheme.darkSurface,
-              border: Border(bottom: BorderSide(color: AppTheme.darkBorder)),
-            ),
-            child: Row(
-              children: [
-                // Status indicator
-                Container(
-                  width: 8,
-                  height: 8,
-                  decoration: BoxDecoration(
-                    color: statusColor,
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: statusColor.withValues(alpha: 0.5),
-                        blurRadius: 6,
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  statusText,
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500,
-                    color: statusColor,
-                  ),
-                ),
-                const SizedBox(width: 14),
-                Container(
-                  height: 16,
-                  width: 1,
-                  color: AppTheme.darkBorder,
-                ),
-                const SizedBox(width: 14),
-                Text(
-                  '${host.username}@${host.host}:${host.port}',
-                  style: const TextStyle(
-                    fontSize: 12,
-                    fontFamily: 'monospace',
-                    color: Color(0xFFCBD5E1),
-                  ),
-                ),
-                const Spacer(),
-
-                // Font size zoom controls
-                IconButton(
-                  onPressed: () {
-                    if (_fontSize > 10) setState(() => _fontSize -= 1);
-                  },
-                  icon: const Icon(Icons.remove, size: 16),
-                  splashRadius: 14,
-                  tooltip: 'Diminuir Fonte',
-                ),
-                Text(
-                  '${_fontSize.toInt()}px',
-                  style: const TextStyle(fontSize: 11, color: Color(0xFF94A3B8)),
-                ),
-                IconButton(
-                  onPressed: () {
-                    if (_fontSize < 24) setState(() => _fontSize += 1);
-                  },
-                  icon: const Icon(Icons.add, size: 16),
-                  splashRadius: 14,
-                  tooltip: 'Aumentar Fonte',
-                ),
-                const SizedBox(width: 8),
-
-                // Clear screen
-                IconButton(
-                  onPressed: _clearTerminal,
-                  icon: const Icon(Icons.cleaning_services_outlined, size: 16),
-                  splashRadius: 14,
-                  tooltip: 'Limpar Tela',
-                ),
-                const SizedBox(width: 4),
-
-                // Reconnect button
-                IconButton(
-                  onPressed: widget.onReconnect,
-                  icon: const Icon(Icons.refresh, size: 16),
-                  splashRadius: 14,
-                  tooltip: 'Reconectar',
-                ),
-                const SizedBox(width: 4),
-
-                // Close tab
-                IconButton(
-                  onPressed: widget.onClose,
-                  icon: const Icon(Icons.close, size: 16),
-                  splashRadius: 14,
-                  tooltip: 'Fechar Terminal',
-                ),
-              ],
-            ),
+    return Column(
+      children: [
+        Container(
+          height: 44,
+          padding: const EdgeInsets.symmetric(horizontal: 8),
+          decoration: const BoxDecoration(
+            color: AppTheme.darkSurface,
+            border: Border(bottom: BorderSide(color: AppTheme.darkBorder)),
           ),
-
-          // Embedded xterm TerminalView
-          Expanded(
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final compact = constraints.maxWidth < 480;
+              return Row(
+                children: [
+                  const SizedBox(width: 4),
+                  Tooltip(
+                    message: '$statusText · $address',
+                    child: Icon(Icons.circle, size: 8, color: statusColor),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Row(
+                      children: [
+                        Flexible(
+                          child: Text(
+                            statusText,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(fontSize: 12, color: statusColor),
+                          ),
+                        ),
+                        if (!compact) ...[
+                          const SizedBox(width: 12),
+                          Expanded(
+                            flex: 3,
+                            child: Tooltip(
+                              message: address,
+                              child: Text(
+                                address,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  fontFamily: AppTerminalTheme.fontFamily,
+                                  color: Color(0xFF94A3B8),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                  _toolbarButton(
+                    Icons.remove,
+                    'Diminuir Fonte',
+                    _fontSize > 10 ? () => _adjustFontSize(-1) : null,
+                  ),
+                  SizedBox(
+                    width: 28,
+                    child: Text(
+                      '${_fontSize.toInt()}px',
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        fontSize: 11,
+                        fontFamily: AppTerminalTheme.fontFamily,
+                        color: Color(0xFF94A3B8),
+                      ),
+                    ),
+                  ),
+                  _toolbarButton(
+                    Icons.add,
+                    'Aumentar Fonte',
+                    _fontSize < 24 ? () => _adjustFontSize(1) : null,
+                  ),
+                  if (compact)
+                    PopupMenuButton<_TerminalAction>(
+                      icon: const Icon(Icons.more_vert, size: 16),
+                      tooltip: 'Ações do terminal',
+                      onSelected: _runAction,
+                      itemBuilder: (context) => const [
+                        PopupMenuItem(
+                          value: _TerminalAction.clear,
+                          child: Text('Limpar Tela'),
+                        ),
+                        PopupMenuItem(
+                          value: _TerminalAction.reconnect,
+                          child: Text('Reconectar'),
+                        ),
+                        PopupMenuItem(
+                          value: _TerminalAction.close,
+                          child: Text('Fechar Terminal'),
+                        ),
+                      ],
+                    )
+                  else ...[
+                    _toolbarButton(
+                      Icons.cleaning_services_outlined,
+                      'Limpar Tela',
+                      () => _runAction(_TerminalAction.clear),
+                    ),
+                    _toolbarButton(
+                      Icons.refresh,
+                      'Reconectar',
+                      widget.onReconnect,
+                    ),
+                    _toolbarButton(
+                      Icons.close,
+                      'Fechar Terminal',
+                      widget.onClose,
+                    ),
+                  ],
+                ],
+              );
+            },
+          ),
+        ),
+        Expanded(
+          child: ExcludeFocus(
+            excluding: !widget.isActive,
             child: TerminalView(
               widget.session.terminal,
               theme: AppTerminalTheme.dark,
-              textStyle: TerminalStyle(
+              textStyle: AppTerminalTheme.textStyle.copyWith(
                 fontSize: _fontSize,
-                fontFamily: 'monospace',
-                fontFamilyFallback: const ['JetBrains Mono', 'Fira Code', 'DejaVu Sans Mono', 'monospace'],
               ),
               focusNode: _focusNode,
-              autofocus: true,
-              padding: const EdgeInsets.all(14),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
             ),
           ),
-        ],
-      ),
+        ),
+      ],
+    );
+  }
+
+  Widget _toolbarButton(IconData icon, String label, VoidCallback? onPressed) {
+    return IconButton(
+      onPressed: onPressed,
+      icon: Icon(icon, size: 16),
+      tooltip: label,
+      constraints: const BoxConstraints.tightFor(width: 36, height: 40),
+      padding: EdgeInsets.zero,
     );
   }
 }

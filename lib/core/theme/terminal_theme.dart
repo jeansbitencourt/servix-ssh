@@ -2,11 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:xterm/xterm.dart';
 
 class AppTerminalTheme {
+  static const fontFamily = 'TerminalMono';
+  static const textStyle = TerminalStyle(
+    fontFamily: fontFamily,
+    fontSize: 14,
+    height: 1.25,
+  );
+
   static const TerminalTheme dark = TerminalTheme(
     cursor: Color(0xFF38BDF8),
     selection: Color(0x446366F1),
-    foreground: Color(0xFFF1F5F9),
-    background: Color(0xFF0D121F),
+    foreground: Color(0xFFDCE4EE),
+    background: Color(0xFF0B1018),
     black: Color(0xFF1E293B),
     red: Color(0xFFF43F5E),
     green: Color(0xFF10B981),
@@ -15,7 +22,7 @@ class AppTerminalTheme {
     magenta: Color(0xFFA855F7),
     cyan: Color(0xFF06B6D4),
     white: Color(0xFFE2E8F0),
-    brightBlack: Color(0xFF475569),
+    brightBlack: Color(0xFF738299),
     brightRed: Color(0xFFFB7185),
     brightGreen: Color(0xFF34D399),
     brightYellow: Color(0xFFFDE047),

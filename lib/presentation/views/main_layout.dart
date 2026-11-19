@@ -189,6 +189,7 @@ class _MainLayoutState extends State<MainLayout> {
                       hostStore: _hostStore,
                     ),
                     TerminalViewScreen(
+                      isVisible: _currentIndex == 3,
                       terminalStore: _terminalStore,
                       hostStore: _hostStore,
                     ),
