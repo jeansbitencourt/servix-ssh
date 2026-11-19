@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 
 import '../../core/di/injection.dart';
+import '../../core/theme/app_brand.dart';
 import '../../core/theme/app_theme.dart';
 import '../stores/host_store.dart';
 import '../stores/shortcut_store.dart';
@@ -204,17 +205,11 @@ class _MainLayoutState extends State<MainLayout> {
   }
 
   Widget _buildBrand(bool compact) {
-    final icon = Container(
-      padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [AppTheme.primary, AppTheme.accent],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: const Icon(Icons.terminal_rounded, color: Colors.white, size: 22),
+    final icon = Image.asset(
+      AppBrand.iconAsset,
+      width: compact ? 42 : 52,
+      height: compact ? 42 : 52,
+      excludeFromSemantics: true,
     );
 
     return Container(
@@ -226,7 +221,9 @@ class _MainLayoutState extends State<MainLayout> {
         border: Border(bottom: BorderSide(color: AppTheme.darkBorder)),
       ),
       child: compact
-          ? Center(child: Tooltip(message: 'ControlPanel', child: icon))
+          ? Center(
+              child: Tooltip(message: AppBrand.title, child: icon),
+            )
           : Row(
               children: [
                 icon,
@@ -236,19 +233,19 @@ class _MainLayoutState extends State<MainLayout> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'ControlPanel',
+                        AppBrand.name,
                         style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
+                          fontSize: 20,
+                          fontWeight: FontWeight.w700,
                           color: Colors.white,
                         ),
                       ),
                       Text(
-                        'SSH Linux Suite',
+                        AppBrand.slogan,
                         style: TextStyle(
                           fontSize: 11,
                           fontWeight: FontWeight.w500,
-                          color: AppTheme.accent,
+                          color: Color(0xFF94A3B8),
                         ),
                       ),
                     ],

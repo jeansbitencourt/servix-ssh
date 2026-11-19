@@ -1,5 +1,5 @@
-name: control_panel
-description: "A new Flutter project."
+name: servix
+description: "Servix — SSH Operations Center for Linux."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
@@ -83,6 +83,7 @@ flutter:
   uses-material-design: true
 
   assets:
+    - assets/branding/servix-icon.png
     - assets/fonts/OFL-Liberation.txt
 
   fonts:

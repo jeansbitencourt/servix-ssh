@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:control_panel/core/theme/app_theme.dart';
+import 'package:servix/core/theme/app_theme.dart';
 
 void main() {
   test('AppTheme darkTheme configuration smoke test', () {

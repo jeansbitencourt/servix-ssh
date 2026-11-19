@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:sqlite3/open.dart';
 import 'package:uuid/uuid.dart';
 import 'core/di/injection.dart';
+import 'core/theme/app_brand.dart';
 import 'core/theme/app_theme.dart';
 import 'domain/entities/shortcut_command.dart';
 import 'domain/repositories/shortcut_repository.dart';
@@ -29,7 +30,7 @@ void main() async {
   // Seed default popular shortcuts if database has none
   await _seedDefaultShortcuts();
 
-  runApp(const ControlPanelApp());
+  runApp(const ServixApp());
 }
 
 Future<void> _seedDefaultShortcuts() async {
@@ -87,13 +88,13 @@ Future<void> _seedDefaultShortcuts() async {
   }
 }
 
-class ControlPanelApp extends StatelessWidget {
-  const ControlPanelApp({super.key});
+class ServixApp extends StatelessWidget {
+  const ServixApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'ControlPanel - SSH Suite',
+      title: AppBrand.title,
       debugShowCheckedModeBanner: false,
       theme: AppTheme.darkTheme,
       home: const MainLayout(),

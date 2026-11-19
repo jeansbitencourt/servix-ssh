@@ -1,17 +1,17 @@
 import 'dart:ffi';
-import 'package:control_panel/core/utils/date_formatter.dart';
-import 'package:control_panel/data/datasources/local_database.dart';
-import 'package:control_panel/data/repositories/host_repository_impl.dart';
-import 'package:control_panel/data/repositories/shortcut_repository_impl.dart';
-import 'package:control_panel/domain/entities/command_result.dart';
-import 'package:control_panel/domain/entities/shortcut_command.dart';
-import 'package:control_panel/domain/entities/ssh_host.dart';
+import 'package:servix/core/utils/date_formatter.dart';
+import 'package:servix/data/datasources/local_database.dart';
+import 'package:servix/data/repositories/host_repository_impl.dart';
+import 'package:servix/data/repositories/shortcut_repository_impl.dart';
+import 'package:servix/domain/entities/command_result.dart';
+import 'package:servix/domain/entities/shortcut_command.dart';
+import 'package:servix/domain/entities/ssh_host.dart';
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sqlite3/open.dart';
 
 // In-memory fake secure storage for test isolation
-import 'package:control_panel/data/datasources/secure_storage_datasource.dart';
+import 'package:servix/data/datasources/secure_storage_datasource.dart';
 
 class FakeSecureStorageDatasource extends SecureStorageDatasource {
   final Map<String, String> _memory = {};

@@ -4,10 +4,10 @@ project(runner LANGUAGES CXX)
 
 # The name of the executable created for the application. Change this to change
 # the on-disk name of your application.
-set(BINARY_NAME "control_panel")
+set(BINARY_NAME "servix")
 # The unique GTK application identifier for this application. See:
 # https://wiki.gnome.org/HowDoI/ChooseApplicationID
-set(APPLICATION_ID "com.controlpanel.control_panel")
+set(APPLICATION_ID "com.servix.Servix")
 
 # Explicitly opt in to modern CMake behaviors to avoid warnings with recent
 # versions of CMake.
@@ -74,6 +74,16 @@ set_target_properties(${BINARY_NAME}
 # them to the application.
 include(flutter/generated_plugins.cmake)
 
+# Keep existing Linux credentials reachable after renaming the GTK application.
+if(TARGET flutter_secure_storage_linux_plugin)
+  get_target_property(SECURE_STORAGE_DIR flutter_secure_storage_linux_plugin SOURCE_DIR)
+  get_property(SECURE_STORAGE_DEFINITIONS DIRECTORY "${SECURE_STORAGE_DIR}"
+    PROPERTY COMPILE_DEFINITIONS)
+  list(FILTER SECURE_STORAGE_DEFINITIONS EXCLUDE REGEX "^APPLICATION_ID=")
+  list(APPEND SECURE_STORAGE_DEFINITIONS "APPLICATION_ID=\"com.controlpanel.control_panel\"")
+  set_property(DIRECTORY "${SECURE_STORAGE_DIR}" PROPERTY COMPILE_DEFINITIONS
+    "${SECURE_STORAGE_DEFINITIONS}")
+endif()
 
 # === Installation ===
 # By default, "installing" just makes a relocatable bundle in the build
