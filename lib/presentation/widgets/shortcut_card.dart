@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../core/theme/app_theme.dart';
 import '../../domain/entities/shortcut_command.dart';
 
@@ -33,25 +34,39 @@ class ShortcutCard extends StatelessWidget {
           // Header: Category and Actions
           Row(
             children: [
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: AppTheme.primary.withValues(alpha: 0.15),
-                  borderRadius: BorderRadius.circular(6),
-                ),
-                child: Text(
-                  shortcut.category,
-                  style: const TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w600,
-                    color: AppTheme.accent,
+              Expanded(
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppTheme.primary.withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Text(
+                      shortcut.category,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                        color: AppTheme.accent,
+                      ),
+                    ),
                   ),
                 ),
               ),
-              const Spacer(),
+              const SizedBox(width: 8),
               IconButton(
                 onPressed: onEdit,
-                icon: const Icon(Icons.edit_outlined, size: 16, color: Color(0xFF94A3B8)),
+                icon: const Icon(
+                  Icons.edit_outlined,
+                  size: 16,
+                  color: Color(0xFF94A3B8),
+                ),
                 splashRadius: 14,
                 padding: EdgeInsets.zero,
                 constraints: const BoxConstraints(),
@@ -60,7 +75,11 @@ class ShortcutCard extends StatelessWidget {
               const SizedBox(width: 8),
               IconButton(
                 onPressed: onDelete,
-                icon: const Icon(Icons.delete_outline_rounded, size: 16, color: AppTheme.error),
+                icon: const Icon(
+                  Icons.delete_outline_rounded,
+                  size: 16,
+                  color: AppTheme.error,
+                ),
                 splashRadius: 14,
                 padding: EdgeInsets.zero,
                 constraints: const BoxConstraints(),
@@ -111,20 +130,29 @@ class ShortcutCard extends StatelessWidget {
           // Footer: Details and Run Button
           Row(
             children: [
-              Icon(Icons.timer_outlined, size: 14, color: const Color(0xFF64748B)),
+              Icon(
+                Icons.timer_outlined,
+                size: 14,
+                color: const Color(0xFF64748B),
+              ),
               const SizedBox(width: 4),
               Text(
                 '${shortcut.timeoutSeconds}s',
                 style: const TextStyle(fontSize: 11, color: Color(0xFF64748B)),
               ),
-              if (shortcut.workingDirectory != null && shortcut.workingDirectory!.isNotEmpty) ...[
+              if (shortcut.workingDirectory != null &&
+                  shortcut.workingDirectory!.isNotEmpty) ...[
                 const SizedBox(width: 8),
                 const Text('•', style: TextStyle(color: Color(0xFF64748B))),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
                     shortcut.workingDirectory!,
-                    style: const TextStyle(fontSize: 11, color: Color(0xFF64748B), fontFamily: 'monospace'),
+                    style: const TextStyle(
+                      fontSize: 11,
+                      color: Color(0xFF64748B),
+                      fontFamily: 'monospace',
+                    ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -137,13 +165,22 @@ class ShortcutCard extends StatelessWidget {
                     ? const SizedBox(
                         width: 14,
                         height: 14,
-                        child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
                       )
                     : const Icon(Icons.play_arrow_rounded, size: 16),
                 label: Text(isRunning ? 'Executando...' : 'Executar'),
                 style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                  textStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 8,
+                  ),
+                  textStyle: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
             ],

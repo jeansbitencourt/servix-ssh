@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:signals_flutter/signals_flutter.dart';
+
 import '../../core/theme/app_theme.dart';
 import '../../core/utils/date_formatter.dart';
 import '../../domain/entities/ssh_host.dart';
@@ -10,7 +11,7 @@ import '../widgets/command_output_modal.dart';
 import '../widgets/host_card.dart';
 import '../widgets/host_form_dialog.dart';
 
-class HostsView extends StatelessWidget {
+class HostsView extends StatefulWidget {
   final HostStore hostStore;
   final ShortcutStore shortcutStore;
   final TerminalSessionStore terminalStore;
@@ -25,383 +26,563 @@ class HostsView extends StatelessWidget {
   });
 
   @override
+  State<HostsView> createState() => _HostsViewState();
+}
+
+class _HostsViewState extends State<HostsView> {
+  bool _showDetails = false;
+
+  HostStore get hostStore => widget.hostStore;
+  ShortcutStore get shortcutStore => widget.shortcutStore;
+  TerminalSessionStore get terminalStore => widget.terminalStore;
+
+  @override
   Widget build(BuildContext context) {
-    return SignalBuilder(builder: (context) {
-      final hosts = hostStore.filteredHosts.value;
-      final selectedHost = hostStore.selectedHost.value;
-      final groups = hostStore.groups.value;
-      final selectedGroup = hostStore.selectedGroup.value;
-      final shortcuts = shortcutStore.shortcuts.value;
-      final isTesting = hostStore.isTestingConnection.value;
-      final testResult = hostStore.connectionTestResult.value;
-      final testSuccess = hostStore.isConnectionSuccess.value;
+    return SignalBuilder(
+      builder: (context) {
+        final hosts = hostStore.filteredHosts.value;
+        final selectedHost = hostStore.selectedHost.value;
+        final groups = hostStore.groups.value;
+        final selectedGroup = hostStore.selectedGroup.value;
+        final hasSearch = hostStore.searchQuery.value.isNotEmpty;
+        final shortcuts = shortcutStore.shortcuts.value;
+        final isTesting = hostStore.isTestingConnection.value;
+        final testResult = hostStore.connectionTestResult.value;
+        final testSuccess = hostStore.isConnectionSuccess.value;
 
-      final lastRes = shortcutStore.lastResult.value;
-      final isOutputOpen = shortcutStore.isOutputModalVisible.value;
+        final lastRes = shortcutStore.lastResult.value;
+        final isOutputOpen = shortcutStore.isOutputModalVisible.value;
 
-      return Stack(
-        children: [
-          Row(
-            children: [
-              // Master Pane: Host List
-              Container(
-                width: 380,
-                decoration: const BoxDecoration(
-                  color: AppTheme.darkSurface,
-                  border: Border(right: BorderSide(color: AppTheme.darkBorder)),
-                ),
-                child: Column(
-                  children: [
-                    // Search & Actions Header
-                    Padding(
-                      padding: const EdgeInsets.all(16),
+        return LayoutBuilder(
+          builder: (context, constraints) {
+            final compact = constraints.maxWidth < 800;
+            final showDetails = selectedHost != null && _showDetails;
+            final listWidth = compact ? constraints.maxWidth : 320.0;
+
+            return Stack(
+              fit: StackFit.expand,
+              children: [
+                Positioned(
+                  top: 0,
+                  bottom: 0,
+                  left: 0,
+                  width: listWidth,
+                  child: Visibility(
+                    visible: !compact || !showDetails,
+                    maintainState: true,
+                    child: Container(
+                      decoration: const BoxDecoration(
+                        color: AppTheme.darkSurface,
+                        border: Border(
+                          right: BorderSide(color: AppTheme.darkBorder),
+                        ),
+                      ),
                       child: Column(
                         children: [
-                          TextField(
-                            decoration: InputDecoration(
-                              hintText: 'Buscar por nome, host ou usuário...',
-                              prefixIcon: const Icon(Icons.search, size: 18),
-                              isDense: true,
-                              contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                              suffixIcon: hostStore.searchQuery.value.isNotEmpty
-                                  ? IconButton(
-                                      icon: const Icon(Icons.clear, size: 16),
-                                      onPressed: () => hostStore.searchQuery.value = '',
-                                    )
-                                  : null,
-                            ),
-                            onChanged: (v) => hostStore.searchQuery.value = v,
-                          ),
-                          const SizedBox(height: 12),
-                          // Group Chips
-                          SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
-                            child: Row(
-                              children: groups.map((g) {
-                                final isSelected = g == selectedGroup;
-                                return Padding(
-                                  padding: const EdgeInsets.only(right: 6),
-                                  child: ChoiceChip(
-                                    label: Text(g),
-                                    selected: isSelected,
-                                    onSelected: (_) => hostStore.selectedGroup.value = g,
-                                    selectedColor: AppTheme.primary.withValues(alpha: 0.2),
-                                    labelStyle: TextStyle(
-                                      fontSize: 12,
-                                      fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                                      color: isSelected ? AppTheme.accent : const Color(0xFF94A3B8),
+                          // Search & Actions Header
+                          Padding(
+                            padding: const EdgeInsets.all(16),
+                            child: Column(
+                              children: [
+                                TextField(
+                                  decoration: InputDecoration(
+                                    hintText:
+                                        'Buscar por nome, host ou usuário...',
+                                    prefixIcon: const Icon(
+                                      Icons.search,
+                                      size: 18,
                                     ),
-                                    side: BorderSide(
-                                      color: isSelected ? AppTheme.primary : AppTheme.darkBorder,
+                                    isDense: true,
+                                    contentPadding: const EdgeInsets.symmetric(
+                                      horizontal: 12,
+                                      vertical: 10,
                                     ),
+                                    suffixIcon: hasSearch
+                                        ? IconButton(
+                                            icon: const Icon(
+                                              Icons.clear,
+                                              size: 16,
+                                            ),
+                                            onPressed: () =>
+                                                hostStore.searchQuery.value =
+                                                    '',
+                                          )
+                                        : null,
                                   ),
-                                );
-                              }).toList(),
+                                  onChanged: (v) =>
+                                      hostStore.searchQuery.value = v,
+                                ),
+                                const SizedBox(height: 12),
+                                // Group Chips
+                                SingleChildScrollView(
+                                  scrollDirection: Axis.horizontal,
+                                  child: Row(
+                                    children: groups.map((g) {
+                                      final isSelected = g == selectedGroup;
+                                      return Padding(
+                                        padding: const EdgeInsets.only(
+                                          right: 6,
+                                        ),
+                                        child: ChoiceChip(
+                                          label: Text(g),
+                                          selected: isSelected,
+                                          onSelected: (_) =>
+                                              hostStore.selectedGroup.value = g,
+                                          selectedColor: AppTheme.primary
+                                              .withValues(alpha: 0.2),
+                                          labelStyle: TextStyle(
+                                            fontSize: 12,
+                                            fontWeight: isSelected
+                                                ? FontWeight.bold
+                                                : FontWeight.normal,
+                                            color: isSelected
+                                                ? AppTheme.accent
+                                                : const Color(0xFF94A3B8),
+                                          ),
+                                          side: BorderSide(
+                                            color: isSelected
+                                                ? AppTheme.primary
+                                                : AppTheme.darkBorder,
+                                          ),
+                                        ),
+                                      );
+                                    }).toList(),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const Divider(color: AppTheme.darkBorder, height: 1),
+
+                          // Hosts List
+                          Expanded(
+                            child: hosts.isEmpty
+                                ? Center(
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Icon(
+                                          Icons.dns_outlined,
+                                          size: 40,
+                                          color: Colors.grey[600],
+                                        ),
+                                        const SizedBox(height: 12),
+                                        Text(
+                                          'Nenhum servidor encontrado',
+                                          style: TextStyle(
+                                            color: Colors.grey[400],
+                                            fontSize: 13,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  )
+                                : ListView.separated(
+                                    padding: const EdgeInsets.all(16),
+                                    itemCount: hosts.length,
+                                    separatorBuilder: (_, _) =>
+                                        const SizedBox(height: 10),
+                                    itemBuilder: (context, index) {
+                                      final host = hosts[index];
+                                      final isSelected =
+                                          host.id == selectedHost?.id;
+
+                                      return HostCard(
+                                        host: host,
+                                        isSelected: isSelected,
+                                        onSelect: () {
+                                          hostStore.selectHost(host);
+                                          setState(() => _showDetails = true);
+                                        },
+                                        onOpenTerminal: () async {
+                                          await terminalStore.openSession(host);
+                                          widget.onNavigateToTerminal();
+                                        },
+                                        onEdit: () {
+                                          showDialog(
+                                            context: context,
+                                            builder: (_) => HostFormDialog(
+                                              hostToEdit: host,
+                                              hostStore: hostStore,
+                                            ),
+                                          );
+                                        },
+                                        onDelete: () =>
+                                            _confirmDelete(context, host),
+                                      );
+                                    },
+                                  ),
+                          ),
+
+                          // Bottom Add Host Button
+                          Container(
+                            padding: const EdgeInsets.all(16),
+                            decoration: const BoxDecoration(
+                              border: Border(
+                                top: BorderSide(color: AppTheme.darkBorder),
+                              ),
+                            ),
+                            child: SizedBox(
+                              width: double.infinity,
+                              child: ElevatedButton.icon(
+                                onPressed: () {
+                                  showDialog(
+                                    context: context,
+                                    builder: (_) =>
+                                        HostFormDialog(hostStore: hostStore),
+                                  );
+                                },
+                                icon: const Icon(Icons.add_rounded, size: 18),
+                                label: const Text('Cadastrar Novo Servidor'),
+                              ),
                             ),
                           ),
                         ],
                       ),
                     ),
-                    const Divider(color: AppTheme.darkBorder, height: 1),
-
-                    // Hosts List
-                    Expanded(
-                      child: hosts.isEmpty
-                          ? Center(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(Icons.dns_outlined, size: 40, color: Colors.grey[600]),
-                                  const SizedBox(height: 12),
-                                  Text(
-                                    'Nenhum servidor encontrado',
-                                    style: TextStyle(color: Colors.grey[400], fontSize: 13),
-                                  ),
-                                ],
-                              ),
-                            )
-                          : ListView.separated(
-                              padding: const EdgeInsets.all(16),
-                              itemCount: hosts.length,
-                              separatorBuilder: (_, _) => const SizedBox(height: 10),
-                              itemBuilder: (context, index) {
-                                final host = hosts[index];
-                                final isSelected = host.id == selectedHost?.id;
-
-                                return HostCard(
-                                  host: host,
-                                  isSelected: isSelected,
-                                  onSelect: () => hostStore.selectHost(host),
-                                  onOpenTerminal: () async {
-                                    await terminalStore.openSession(host);
-                                    onNavigateToTerminal();
-                                  },
-                                  onEdit: () {
-                                    showDialog(
-                                      context: context,
-                                      builder: (_) => HostFormDialog(
-                                        hostToEdit: host,
-                                        hostStore: hostStore,
-                                      ),
-                                    );
-                                  },
-                                  onDelete: () => _confirmDelete(context, host),
-                                );
-                              },
-                            ),
-                    ),
-
-                    // Bottom Add Host Button
-                    Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: const BoxDecoration(
-                        border: Border(top: BorderSide(color: AppTheme.darkBorder)),
-                      ),
-                      child: SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton.icon(
-                          onPressed: () {
-                            showDialog(
-                              context: context,
-                              builder: (_) => HostFormDialog(hostStore: hostStore),
-                            );
-                          },
-                          icon: const Icon(Icons.add_rounded, size: 18),
-                          label: const Text('Cadastrar Novo Servidor'),
-                        ),
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
-              ),
-
-              // Detail Pane: Server Inspection
-              Expanded(
-                child: selectedHost == null
-                    ? Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.touch_app_outlined, size: 48, color: Colors.grey[600]),
-                            const SizedBox(height: 16),
-                            const Text(
-                              'Selecione um servidor da lista para inspecionar',
-                              style: TextStyle(color: Color(0xFF94A3B8), fontSize: 15),
+                Positioned(
+                  top: 0,
+                  bottom: 0,
+                  left: compact ? 0 : listWidth,
+                  right: 0,
+                  child: Visibility(
+                    visible: !compact || showDetails,
+                    maintainState: true,
+                    child: selectedHost == null
+                        ? Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.touch_app_outlined,
+                                  size: 48,
+                                  color: Colors.grey[600],
+                                ),
+                                const SizedBox(height: 16),
+                                const Text(
+                                  'Selecione um servidor da lista para inspecionar',
+                                  style: TextStyle(
+                                    color: Color(0xFF94A3B8),
+                                    fontSize: 15,
+                                  ),
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
-                      )
-                    : SingleChildScrollView(
-                        padding: const EdgeInsets.all(32),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // Header
-                            Row(
+                          )
+                        : SingleChildScrollView(
+                            padding: EdgeInsets.all(compact ? 16 : 24),
+                            child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Container(
-                                  padding: const EdgeInsets.all(16),
-                                  decoration: BoxDecoration(
-                                    color: AppTheme.primary.withValues(alpha: 0.15),
-                                    borderRadius: BorderRadius.circular(14),
-                                    border: Border.all(color: AppTheme.primary.withValues(alpha: 0.3)),
+                                if (compact) ...[
+                                  TextButton.icon(
+                                    onPressed: () =>
+                                        setState(() => _showDetails = false),
+                                    icon: const Icon(
+                                      Icons.arrow_back_rounded,
+                                      size: 18,
+                                    ),
+                                    label: const Text('Voltar à lista'),
                                   ),
-                                  child: const Icon(Icons.dns_rounded, size: 36, color: AppTheme.accent),
-                                ),
-                                const SizedBox(width: 20),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Row(
-                                        children: [
-                                          Text(
-                                            selectedHost.name,
-                                            style: const TextStyle(
-                                              fontSize: 22,
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.white,
-                                            ),
+                                  const SizedBox(height: 12),
+                                ],
+                                Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Container(
+                                      padding: const EdgeInsets.all(16),
+                                      decoration: BoxDecoration(
+                                        color: AppTheme.primary.withValues(
+                                          alpha: 0.15,
+                                        ),
+                                        borderRadius: BorderRadius.circular(14),
+                                        border: Border.all(
+                                          color: AppTheme.primary.withValues(
+                                            alpha: 0.3,
                                           ),
-                                          const SizedBox(width: 12),
-                                          Container(
-                                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                                            decoration: BoxDecoration(
-                                              color: AppTheme.darkSurfaceCard,
-                                              borderRadius: BorderRadius.circular(6),
-                                              border: Border.all(color: AppTheme.darkBorder),
-                                            ),
-                                            child: Text(
-                                              selectedHost.groupName,
-                                              style: const TextStyle(
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.w500,
-                                                color: Color(0xFFCBD5E1),
+                                        ),
+                                      ),
+                                      child: const Icon(
+                                        Icons.dns_rounded,
+                                        size: 36,
+                                        color: AppTheme.accent,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 20),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Wrap(
+                                            spacing: 12,
+                                            runSpacing: 6,
+                                            crossAxisAlignment:
+                                                WrapCrossAlignment.center,
+                                            children: [
+                                              Text(
+                                                selectedHost.name,
+                                                style: const TextStyle(
+                                                  fontSize: 22,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.white,
+                                                ),
                                               ),
+                                              Container(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                      horizontal: 10,
+                                                      vertical: 4,
+                                                    ),
+                                                decoration: BoxDecoration(
+                                                  color:
+                                                      AppTheme.darkSurfaceCard,
+                                                  borderRadius:
+                                                      BorderRadius.circular(6),
+                                                  border: Border.all(
+                                                    color: AppTheme.darkBorder,
+                                                  ),
+                                                ),
+                                                child: Text(
+                                                  selectedHost.groupName,
+                                                  style: const TextStyle(
+                                                    fontSize: 12,
+                                                    fontWeight: FontWeight.w500,
+                                                    color: Color(0xFFCBD5E1),
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          const SizedBox(height: 6),
+                                          Text(
+                                            '${selectedHost.username}@${selectedHost.host}:${selectedHost.port}',
+                                            style: const TextStyle(
+                                              fontSize: 14,
+                                              color: Color(0xFF94A3B8),
+                                              fontFamily: 'monospace',
                                             ),
                                           ),
                                         ],
                                       ),
-                                      const SizedBox(height: 6),
-                                      Text(
-                                        '${selectedHost.username}@${selectedHost.host}:${selectedHost.port}',
-                                        style: const TextStyle(
-                                          fontSize: 14,
-                                          color: Color(0xFF94A3B8),
-                                          fontFamily: 'monospace',
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 12),
+                                ElevatedButton.icon(
+                                  onPressed: () async {
+                                    await terminalStore.openSession(
+                                      selectedHost,
+                                    );
+                                    widget.onNavigateToTerminal();
+                                  },
+                                  icon: const Icon(
+                                    Icons.terminal_rounded,
+                                    size: 18,
+                                  ),
+                                  label: const Text('Abrir Terminal'),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: AppTheme.accent,
+                                    foregroundColor: Colors.black,
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 20,
+                                      vertical: 14,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(height: 28),
+
+                                // Connection Test Banner
+                                Container(
+                                  padding: const EdgeInsets.all(16),
+                                  decoration: BoxDecoration(
+                                    color: AppTheme.darkSurfaceCard,
+                                    borderRadius: BorderRadius.circular(12),
+                                    border: Border.all(
+                                      color: AppTheme.darkBorder,
+                                    ),
+                                  ),
+                                  child: LayoutBuilder(
+                                    builder: (context, constraints) {
+                                      final status = Row(
+                                        children: [
+                                          Icon(
+                                            testSuccess == true
+                                                ? Icons.check_circle
+                                                : testSuccess == false
+                                                ? Icons.error
+                                                : Icons.network_check_rounded,
+                                            color: testSuccess == true
+                                                ? AppTheme.success
+                                                : testSuccess == false
+                                                ? AppTheme.error
+                                                : AppTheme.accent,
+                                            size: 22,
+                                          ),
+                                          const SizedBox(width: 12),
+                                          Expanded(
+                                            child: Text(
+                                              testResult ?? 'Verifique a conectividade SSH com a porta e credenciais.',
+                                              style: TextStyle(
+                                                fontSize: 13,
+                                                color: testSuccess == true
+                                                    ? AppTheme.success
+                                                    : testSuccess == false
+                                                    ? AppTheme.error
+                                                    : const Color(0xFFCBD5E1),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      );
+                                      final testButton = OutlinedButton(
+                                        onPressed: isTesting
+                                            ? null
+                                            : () => hostStore.testConnection(
+                                                selectedHost,
+                                              ),
+                                        child: isTesting
+                                            ? const SizedBox(
+                                                width: 16,
+                                                height: 16,
+                                                child:
+                                                    CircularProgressIndicator(
+                                                      strokeWidth: 2,
+                                                    ),
+                                              )
+                                            : const Text('Testar Conexão'),
+                                      );
+                                      if (constraints.maxWidth < 400) {
+                                        return Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            status,
+                                            const SizedBox(height: 12),
+                                            testButton,
+                                          ],
+                                        );
+                                      }
+                                      return Row(
+                                        children: [
+                                          Expanded(child: status),
+                                          const SizedBox(width: 12),
+                                          testButton,
+                                        ],
+                                      );
+                                    },
+                                  ),
+                                ),
+                                const SizedBox(height: 28),
+
+                                // Technical Info Card
+                                Container(
+                                  padding: const EdgeInsets.all(20),
+                                  decoration: BoxDecoration(
+                                    color: AppTheme.darkSurfaceCard,
+                                    borderRadius: BorderRadius.circular(12),
+                                    border: Border.all(
+                                      color: AppTheme.darkBorder,
+                                    ),
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      const Text(
+                                        'Parâmetros Técnicos de Acesso',
+                                        style: TextStyle(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 16),
+                                      _buildParamRow(
+                                        'Endereço do Host',
+                                        selectedHost.host,
+                                      ),
+                                      _buildParamRow(
+                                        'Porta SSH',
+                                        selectedHost.port.toString(),
+                                      ),
+                                      _buildParamRow(
+                                        'Usuário',
+                                        selectedHost.username,
+                                      ),
+                                      _buildParamRow(
+                                        'Tipo de Autenticação',
+                                        selectedHost.authType ==
+                                                SSHAuthType.privateKey
+                                            ? 'Chave Privada (Ed25519/RSA)'
+                                            : 'Senha (Armazenada no Keyring)',
+                                      ),
+                                      if (selectedHost.keyFilePath != null)
+                                        _buildParamRow(
+                                          'Arquivo de Chave',
+                                          selectedHost.keyFilePath!,
+                                        ),
+                                      _buildParamRow(
+                                        'Cadastrado em',
+                                        DateFormatter.formatDateTime(
+                                          selectedHost.createdAt,
                                         ),
                                       ),
                                     ],
                                   ),
                                 ),
-                                ElevatedButton.icon(
-                                  onPressed: () async {
-                                    await terminalStore.openSession(selectedHost);
-                                    onNavigateToTerminal();
-                                  },
-                                  icon: const Icon(Icons.terminal_rounded, size: 18),
-                                  label: const Text('Abrir Terminal'),
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: AppTheme.accent,
-                                    foregroundColor: Colors.black,
-                                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 28),
+                                const SizedBox(height: 28),
 
-                            // Connection Test Banner
-                            Container(
-                              padding: const EdgeInsets.all(16),
-                              decoration: BoxDecoration(
-                                color: AppTheme.darkSurfaceCard,
-                                borderRadius: BorderRadius.circular(12),
-                                border: Border.all(color: AppTheme.darkBorder),
-                              ),
-                              child: Row(
-                                children: [
-                                  Icon(
-                                    testSuccess == true
-                                        ? Icons.check_circle
-                                        : testSuccess == false
-                                            ? Icons.error
-                                            : Icons.network_check_rounded,
-                                    color: testSuccess == true
-                                        ? AppTheme.success
-                                        : testSuccess == false
-                                            ? AppTheme.error
-                                            : AppTheme.accent,
-                                    size: 22,
-                                  ),
-                                  const SizedBox(width: 12),
-                                  Expanded(
-                                    child: Text(
-                                      testResult ?? 'Verifique a conectividade SSH com a porta e credenciais.',
+                                // Associated Shortcuts
+                                Wrap(
+                                  spacing: 12,
+                                  runSpacing: 4,
+                                  crossAxisAlignment: WrapCrossAlignment.center,
+                                  children: [
+                                    const Text(
+                                      'Atalhos de Comandos para Este Servidor',
                                       style: TextStyle(
-                                        fontSize: 13,
-                                        color: testSuccess == true
-                                            ? AppTheme.success
-                                            : testSuccess == false
-                                                ? AppTheme.error
-                                                : const Color(0xFFCBD5E1),
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
                                       ),
                                     ),
-                                  ),
-                                  OutlinedButton(
-                                    onPressed: isTesting
-                                        ? null
-                                        : () => hostStore.testConnection(selectedHost),
-                                    child: isTesting
-                                        ? const SizedBox(
-                                            width: 16,
-                                            height: 16,
-                                            child: CircularProgressIndicator(strokeWidth: 2),
-                                          )
-                                        : const Text('Testar Conexão'),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            const SizedBox(height: 28),
-
-                            // Technical Info Card
-                            Container(
-                              padding: const EdgeInsets.all(20),
-                              decoration: BoxDecoration(
-                                color: AppTheme.darkSurfaceCard,
-                                borderRadius: BorderRadius.circular(12),
-                                border: Border.all(color: AppTheme.darkBorder),
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  const Text(
-                                    'Parâmetros Técnicos de Acesso',
-                                    style: TextStyle(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
+                                    Text(
+                                      '${shortcuts.where((s) => s.hostId == null || s.hostId == selectedHost.id).length} disponíveis',
+                                      style: const TextStyle(
+                                        fontSize: 12,
+                                        color: Color(0xFF94A3B8),
+                                      ),
                                     ),
-                                  ),
-                                  const SizedBox(height: 16),
-                                  _buildParamRow('Endereço do Host', selectedHost.host),
-                                  _buildParamRow('Porta SSH', selectedHost.port.toString()),
-                                  _buildParamRow('Usuário', selectedHost.username),
-                                  _buildParamRow(
-                                    'Tipo de Autenticação',
-                                    selectedHost.authType == SSHAuthType.privateKey
-                                        ? 'Chave Privada (Ed25519/RSA)'
-                                        : 'Senha (Armazenada no Keyring)',
-                                  ),
-                                  if (selectedHost.keyFilePath != null)
-                                    _buildParamRow('Arquivo de Chave', selectedHost.keyFilePath!),
-                                  _buildParamRow(
-                                    'Cadastrado em',
-                                    DateFormatter.formatDateTime(selectedHost.createdAt),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            const SizedBox(height: 28),
-
-                            // Associated Shortcuts
-                            Row(
-                              children: [
-                                const Text(
-                                  'Atalhos de Comandos para Este Servidor',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
-                                  ),
+                                  ],
                                 ),
-                                const Spacer(),
-                                Text(
-                                  '${shortcuts.where((s) => s.hostId == null || s.hostId == selectedHost.id).length} disponíveis',
-                                  style: const TextStyle(fontSize: 12, color: Color(0xFF94A3B8)),
+                                const SizedBox(height: 14),
+                                _buildShortcutsGrid(
+                                  context,
+                                  selectedHost,
+                                  shortcuts,
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 14),
-                            _buildShortcutsGrid(context, selectedHost, shortcuts),
-                          ],
-                        ),
-                      ),
-              ),
-            ],
-          ),
+                          ),
+                  ),
+                ),
 
-          // Output modal overlay
-          if (isOutputOpen && lastRes != null)
-            CommandOutputModal(
-              result: lastRes,
-              onClose: () => shortcutStore.closeOutputModal(),
-            ),
-        ],
-      );
-    });
+                // Output modal overlay
+                if (isOutputOpen && lastRes != null)
+                  CommandOutputModal(
+                    result: lastRes,
+                    onClose: () => shortcutStore.closeOutputModal(),
+                  ),
+              ],
+            );
+          },
+        );
+      },
+    );
   }
 
   Widget _buildParamRow(String label, String value) {
@@ -410,14 +591,16 @@ class HostsView extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SizedBox(
-            width: 180,
+          Expanded(
+            flex: 2,
             child: Text(
               label,
               style: const TextStyle(fontSize: 13, color: Color(0xFF94A3B8)),
             ),
           ),
+          const SizedBox(width: 12),
           Expanded(
+            flex: 3,
             child: Text(
               value,
               style: const TextStyle(
@@ -433,8 +616,14 @@ class HostsView extends StatelessWidget {
     );
   }
 
-  Widget _buildShortcutsGrid(BuildContext context, SSHHost host, dynamic shortcuts) {
-    final available = shortcuts.where((s) => s.hostId == null || s.hostId == host.id).toList();
+  Widget _buildShortcutsGrid(
+    BuildContext context,
+    SSHHost host,
+    dynamic shortcuts,
+  ) {
+    final available = shortcuts
+        .where((s) => s.hostId == null || s.hostId == host.id)
+        .toList();
 
     if (available.isEmpty) {
       return Container(
@@ -453,72 +642,83 @@ class HostsView extends StatelessWidget {
       );
     }
 
-    return GridView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        mainAxisExtent: 100,
-        crossAxisSpacing: 14,
-        mainAxisSpacing: 14,
-      ),
-      itemCount: available.length,
-      itemBuilder: (context, index) {
-        final s = available[index];
-        final isRunning = shortcutStore.isShortcutRunning(s.id);
+    return LayoutBuilder(
+      builder: (context, constraints) => GridView.builder(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: constraints.maxWidth >= 540 ? 2 : 1,
+          mainAxisExtent: 100,
+          crossAxisSpacing: 14,
+          mainAxisSpacing: 14,
+        ),
+        itemCount: available.length,
+        itemBuilder: (context, index) {
+          final s = available[index];
+          final isRunning = shortcutStore.isShortcutRunning(s.id);
 
-        return Container(
-          padding: const EdgeInsets.all(14),
-          decoration: BoxDecoration(
-            color: AppTheme.darkSurfaceCard,
-            borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: AppTheme.darkBorder),
-          ),
-          child: Row(
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      s.name,
-                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.white),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      '\$ ${s.command}',
-                      style: const TextStyle(
-                        fontFamily: 'monospace',
-                        fontSize: 11,
-                        color: Color(0xFF94A3B8),
+          return Container(
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              color: AppTheme.darkSurfaceCard,
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: AppTheme.darkBorder),
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        s.name,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 13,
+                          color: Colors.white,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+                      const SizedBox(height: 4),
+                      Text(
+                        '\$ ${s.command}',
+                        style: const TextStyle(
+                          fontFamily: 'monospace',
+                          fontSize: 11,
+                          color: Color(0xFF94A3B8),
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 8),
+                ElevatedButton(
+                  onPressed: isRunning
+                      ? null
+                      : () => shortcutStore.execute(s, host),
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 8,
                     ),
-                  ],
+                  ),
+                  child: isRunning
+                      ? const SizedBox(
+                          width: 14,
+                          height: 14,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Icon(Icons.play_arrow_rounded, size: 18),
                 ),
-              ),
-              const SizedBox(width: 8),
-              ElevatedButton(
-                onPressed: isRunning ? null : () => shortcutStore.execute(s, host),
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                ),
-                child: isRunning
-                    ? const SizedBox(
-                        width: 14,
-                        height: 14,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
-                    : const Icon(Icons.play_arrow_rounded, size: 18),
-              ),
-            ],
-          ),
-        );
-      },
+              ],
+            ),
+          );
+        },
+      ),
     );
   }
 
@@ -527,7 +727,9 @@ class HostsView extends StatelessWidget {
       context: context,
       builder: (ctx) => AlertDialog(
         title: const Text('Excluir Servidor?'),
-        content: Text('Tem certeza que deseja remover o servidor "${host.name}" e suas credenciais salvas?'),
+        content: Text(
+          'Tem certeza que deseja remover o servidor "${host.name}" e suas credenciais salvas?',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),

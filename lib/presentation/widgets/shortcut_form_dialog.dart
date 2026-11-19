@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
+
 import '../../core/theme/app_theme.dart';
 import '../../domain/entities/shortcut_command.dart';
 import '../../domain/entities/ssh_host.dart';
@@ -40,7 +41,9 @@ class _ShortcutFormDialogState extends State<ShortcutFormDialog> {
     _commandController = TextEditingController(text: s?.command ?? '');
     _categoryController = TextEditingController(text: s?.category ?? 'Geral');
     _workDirController = TextEditingController(text: s?.workingDirectory ?? '');
-    _timeoutController = TextEditingController(text: (s?.timeoutSeconds ?? 30).toString());
+    _timeoutController = TextEditingController(
+      text: (s?.timeoutSeconds ?? 30).toString(),
+    );
     _selectedHostId = s?.hostId;
   }
 
@@ -58,12 +61,17 @@ class _ShortcutFormDialogState extends State<ShortcutFormDialog> {
   Widget build(BuildContext context) {
     final isEditing = widget.shortcutToEdit != null;
 
+    final compact = MediaQuery.sizeOf(context).width < 600;
+
     return Dialog(
       backgroundColor: AppTheme.darkSurface,
-      insetPadding: const EdgeInsets.symmetric(horizontal: 40, vertical: 24),
+      insetPadding: EdgeInsets.symmetric(
+        horizontal: compact ? 12 : 40,
+        vertical: 24,
+      ),
       child: Container(
         width: 620,
-        padding: const EdgeInsets.all(28),
+        padding: EdgeInsets.all(compact ? 16 : 28),
         decoration: BoxDecoration(
           color: AppTheme.darkSurface,
           borderRadius: BorderRadius.circular(16),
@@ -85,30 +93,39 @@ class _ShortcutFormDialogState extends State<ShortcutFormDialog> {
                         color: AppTheme.primary.withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(10),
                       ),
-                      child: const Icon(Icons.flash_on_rounded, color: AppTheme.accent),
+                      child: const Icon(
+                        Icons.flash_on_rounded,
+                        color: AppTheme.accent,
+                      ),
                     ),
                     const SizedBox(width: 14),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          isEditing ? 'Editar Atalho de Comando' : 'Novo Atalho de Comando',
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            isEditing
+                                ? 'Editar Atalho de Comando'
+                                : 'Novo Atalho de Comando',
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          isEditing
-                              ? 'Modifique as instruções e opções do comando'
-                              : 'Cadastre um comando rápido para execução remota em 1 clique',
-                          style: const TextStyle(fontSize: 12, color: Color(0xFF94A3B8)),
-                        ),
-                      ],
+                          const SizedBox(height: 2),
+                          Text(
+                            isEditing
+                                ? 'Modifique as instruções e opções do comando'
+                                : 'Cadastre um comando rápido para execução remota em 1 clique',
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: Color(0xFF94A3B8),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                    const Spacer(),
                     IconButton(
                       onPressed: () => Navigator.of(context).pop(),
                       icon: const Icon(Icons.close, color: Color(0xFF94A3B8)),
@@ -132,7 +149,9 @@ class _ShortcutFormDialogState extends State<ShortcutFormDialog> {
                           hintText: 'ex: Verificar Uso de Disco',
                           prefixIcon: Icon(Icons.title, size: 18),
                         ),
-                        validator: (v) => v == null || v.trim().isEmpty ? 'Nome é obrigatório' : null,
+                        validator: (v) => v == null || v.trim().isEmpty
+                            ? 'Nome é obrigatório'
+                            : null,
                       ),
                     ),
                     const SizedBox(width: 16),
@@ -165,7 +184,9 @@ class _ShortcutFormDialogState extends State<ShortcutFormDialog> {
                       child: Icon(Icons.terminal, size: 18),
                     ),
                   ),
-                  validator: (v) => v == null || v.trim().isEmpty ? 'Comando é obrigatório' : null,
+                  validator: (v) => v == null || v.trim().isEmpty
+                      ? 'Comando é obrigatório'
+                      : null,
                 ),
                 const SizedBox(height: 16),
 
@@ -176,11 +197,17 @@ class _ShortcutFormDialogState extends State<ShortcutFormDialog> {
                       flex: 3,
                       child: TextFormField(
                         controller: _workDirController,
-                        style: const TextStyle(fontFamily: 'monospace', fontSize: 12),
+                        style: const TextStyle(
+                          fontFamily: 'monospace',
+                          fontSize: 12,
+                        ),
                         decoration: const InputDecoration(
                           labelText: 'Diretório de Trabalho (opcional)',
                           hintText: 'ex: /var/www/meu-app',
-                          prefixIcon: Icon(Icons.folder_open_outlined, size: 18),
+                          prefixIcon: Icon(
+                            Icons.folder_open_outlined,
+                            size: 18,
+                          ),
                         ),
                       ),
                     ),
@@ -209,6 +236,7 @@ class _ShortcutFormDialogState extends State<ShortcutFormDialog> {
 
                 // Host Association Dropdown
                 DropdownButtonFormField<String?>(
+                  isExpanded: true,
                   initialValue: _selectedHostId,
                   dropdownColor: AppTheme.darkSurface,
                   decoration: const InputDecoration(
@@ -218,12 +246,18 @@ class _ShortcutFormDialogState extends State<ShortcutFormDialog> {
                   items: [
                     const DropdownMenuItem<String?>(
                       value: null,
-                      child: Text('Global (Disponível para qualquer servidor)'),
+                      child: Text(
+                        'Global (Disponível para qualquer servidor)',
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
                     ...widget.availableHosts.map(
                       (h) => DropdownMenuItem<String?>(
                         value: h.id,
-                        child: Text('${h.name} (${h.host})'),
+                        child: Text(
+                          '${h.name} (${h.host})',
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ),
                     ),
                   ],
@@ -239,14 +273,15 @@ class _ShortcutFormDialogState extends State<ShortcutFormDialog> {
                 const SizedBox(height: 16),
 
                 // Actions
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
+                Wrap(
+                  alignment: WrapAlignment.end,
+                  spacing: 10,
+                  runSpacing: 8,
                   children: [
                     TextButton(
                       onPressed: () => Navigator.of(context).pop(),
                       child: const Text('Cancelar'),
                     ),
-                    const SizedBox(width: 10),
                     ElevatedButton.icon(
                       onPressed: () async {
                         if (!_formKey.currentState!.validate()) return;
@@ -256,14 +291,19 @@ class _ShortcutFormDialogState extends State<ShortcutFormDialog> {
                           hostId: _selectedHostId,
                           name: _nameController.text.trim(),
                           command: _commandController.text.trim(),
-                          workingDirectory: _workDirController.text.trim().isNotEmpty
+                          workingDirectory:
+                              _workDirController.text.trim().isNotEmpty
                               ? _workDirController.text.trim()
                               : null,
-                          timeoutSeconds: int.tryParse(_timeoutController.text.trim()) ?? 30,
+                          timeoutSeconds:
+                              int.tryParse(_timeoutController.text.trim()) ??
+                              30,
                           category: _categoryController.text.trim().isNotEmpty
                               ? _categoryController.text.trim()
                               : 'Geral',
-                          createdAt: widget.shortcutToEdit?.createdAt ?? DateTime.now(),
+                          createdAt:
+                              widget.shortcutToEdit?.createdAt ??
+                              DateTime.now(),
                         );
 
                         await widget.shortcutStore.saveShortcut(shortcut);
@@ -273,7 +313,9 @@ class _ShortcutFormDialogState extends State<ShortcutFormDialog> {
                         }
                       },
                       icon: const Icon(Icons.save_rounded, size: 16),
-                      label: Text(isEditing ? 'Salvar Alterações' : 'Criar Atalho'),
+                      label: Text(
+                        isEditing ? 'Salvar Alterações' : 'Criar Atalho',
+                      ),
                     ),
                   ],
                 ),

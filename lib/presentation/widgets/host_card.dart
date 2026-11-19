@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../core/theme/app_theme.dart';
 import '../../domain/entities/ssh_host.dart';
 
@@ -29,7 +30,9 @@ class HostCard extends StatelessWidget {
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: isSelected ? AppTheme.darkSurfaceHighlight : AppTheme.darkSurfaceCard,
+          color: isSelected
+              ? AppTheme.darkSurfaceHighlight
+              : AppTheme.darkSurfaceCard,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: isSelected ? AppTheme.primary : AppTheme.darkBorder,
@@ -91,19 +94,27 @@ class HostCard extends StatelessWidget {
                     ],
                   ),
                 ),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: AppTheme.darkBackground,
-                    borderRadius: BorderRadius.circular(6),
-                    border: Border.all(color: AppTheme.darkBorder),
-                  ),
-                  child: Text(
-                    host.groupName,
-                    style: const TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w500,
-                      color: Color(0xFFCBD5E1),
+                const SizedBox(width: 8),
+                Flexible(
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppTheme.darkBackground,
+                      borderRadius: BorderRadius.circular(6),
+                      border: Border.all(color: AppTheme.darkBorder),
+                    ),
+                    child: Text(
+                      host.groupName,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w500,
+                        color: Color(0xFFCBD5E1),
+                      ),
                     ),
                   ),
                 ),
@@ -113,43 +124,65 @@ class HostCard extends StatelessWidget {
             Row(
               children: [
                 Icon(
-                  host.authType == SSHAuthType.privateKey ? Icons.key_rounded : Icons.password_rounded,
+                  host.authType == SSHAuthType.privateKey
+                      ? Icons.key_rounded
+                      : Icons.password_rounded,
                   size: 14,
                   color: const Color(0xFF64748B),
                 ),
                 const SizedBox(width: 6),
-                Text(
-                  host.authType == SSHAuthType.privateKey ? 'Chave SSH' : 'Senha',
-                  style: const TextStyle(fontSize: 12, color: Color(0xFF94A3B8)),
+                Expanded(
+                  child: Text(
+                    host.authType == SSHAuthType.privateKey
+                        ? 'Chave SSH'
+                        : 'Senha',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: Color(0xFF94A3B8),
+                    ),
+                  ),
                 ),
-                const Spacer(),
                 Tooltip(
                   message: 'Abrir Terminal',
                   child: IconButton(
                     onPressed: onOpenTerminal,
-                    icon: const Icon(Icons.terminal_rounded, size: 18, color: AppTheme.accent),
+                    icon: const Icon(
+                      Icons.terminal_rounded,
+                      size: 18,
+                      color: AppTheme.accent,
+                    ),
                     splashRadius: 16,
                     padding: EdgeInsets.zero,
                     constraints: const BoxConstraints(),
                   ),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: 6),
                 Tooltip(
                   message: 'Editar',
                   child: IconButton(
                     onPressed: onEdit,
-                    icon: const Icon(Icons.edit_outlined, size: 18, color: Color(0xFF94A3B8)),
+                    icon: const Icon(
+                      Icons.edit_outlined,
+                      size: 18,
+                      color: Color(0xFF94A3B8),
+                    ),
                     splashRadius: 16,
                     padding: EdgeInsets.zero,
                     constraints: const BoxConstraints(),
                   ),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: 6),
                 Tooltip(
                   message: 'Excluir',
                   child: IconButton(
                     onPressed: onDelete,
-                    icon: const Icon(Icons.delete_outline_rounded, size: 18, color: AppTheme.error),
+                    icon: const Icon(
+                      Icons.delete_outline_rounded,
+                      size: 18,
+                      color: AppTheme.error,
+                    ),
                     splashRadius: 16,
                     padding: EdgeInsets.zero,
                     constraints: const BoxConstraints(),
