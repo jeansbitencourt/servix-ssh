@@ -1,8 +1,4 @@
-import 'dart:ffi';
-import 'dart:io';
-
 import 'package:flutter/material.dart';
-import 'package:sqlite3/open.dart';
 import 'package:uuid/uuid.dart';
 
 import 'core/di/injection.dart';
@@ -15,17 +11,6 @@ import 'presentation/views/main_layout.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
-  // Linux SQLite dynamic library resolution fallback
-  if (Platform.isLinux) {
-    open.overrideFor(OperatingSystem.linux, () {
-      try {
-        return DynamicLibrary.open('libsqlite3.so');
-      } catch (_) {
-        return DynamicLibrary.open('libsqlite3.so.0');
-      }
-    });
-  }
 
   // Initialize GetIt dependencies
   await initDependencies();

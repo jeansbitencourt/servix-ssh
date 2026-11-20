@@ -1707,34 +1707,32 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   ];
 }
 
-typedef $$HostsTableTableCreateCompanionBuilder =
-    HostsTableCompanion Function({
-      required String id,
-      required String name,
-      required String host,
-      Value<int> port,
-      required String username,
-      required String authType,
-      Value<String?> keyFilePath,
-      Value<String> groupName,
-      required DateTime createdAt,
-      required DateTime updatedAt,
-      Value<int> rowid,
-    });
-typedef $$HostsTableTableUpdateCompanionBuilder =
-    HostsTableCompanion Function({
-      Value<String> id,
-      Value<String> name,
-      Value<String> host,
-      Value<int> port,
-      Value<String> username,
-      Value<String> authType,
-      Value<String?> keyFilePath,
-      Value<String> groupName,
-      Value<DateTime> createdAt,
-      Value<DateTime> updatedAt,
-      Value<int> rowid,
-    });
+typedef $$HostsTableTableCreateCompanionBuilder = HostsTableCompanion Function({
+  required String id,
+  required String name,
+  required String host,
+  Value<int> port,
+  required String username,
+  required String authType,
+  Value<String?> keyFilePath,
+  Value<String> groupName,
+  required DateTime createdAt,
+  required DateTime updatedAt,
+  Value<int> rowid,
+});
+typedef $$HostsTableTableUpdateCompanionBuilder = HostsTableCompanion Function({
+  Value<String> id,
+  Value<String> name,
+  Value<String> host,
+  Value<int> port,
+  Value<String> username,
+  Value<String> authType,
+  Value<String?> keyFilePath,
+  Value<String> groupName,
+  Value<DateTime> createdAt,
+  Value<DateTime> updatedAt,
+  Value<int> rowid,
+});
 
 class $$HostsTableTableFilterComposer
     extends Composer<_$AppDatabase, $HostsTableTable> {
@@ -1980,7 +1978,16 @@ class $$HostsTableTableTableManager
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0
-              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .map(
+                (e) => (
+                  e.readTable<$HostsTableTable, HostEntry>(table),
+                  BaseReferences<_$AppDatabase, $HostsTableTable, HostEntry>(
+                    db,
+                    table,
+                    e,
+                  ),
+                ),
+              )
               .toList(),
           prefetchHooksCallback: null,
         ),
@@ -2253,7 +2260,18 @@ class $$ShortcutCommandsTableTableTableManager
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0
-              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .map(
+                (e) => (
+                  e.readTable<$ShortcutCommandsTableTable, ShortcutEntry>(
+                    table,
+                  ),
+                  BaseReferences<
+                    _$AppDatabase,
+                    $ShortcutCommandsTableTable,
+                    ShortcutEntry
+                  >(db, table, e),
+                ),
+              )
               .toList(),
           prefetchHooksCallback: null,
         ),
@@ -2554,7 +2572,19 @@ class $$ExecutionHistoryTableTableTableManager
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0
-              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .map(
+                (e) => (
+                  e.readTable<
+                    $ExecutionHistoryTableTable,
+                    ExecutionHistoryEntry
+                  >(table),
+                  BaseReferences<
+                    _$AppDatabase,
+                    $ExecutionHistoryTableTable,
+                    ExecutionHistoryEntry
+                  >(db, table, e),
+                ),
+              )
               .toList(),
           prefetchHooksCallback: null,
         ),
