@@ -27,10 +27,38 @@ Servix is a Flutter desktop app for **Linux, Windows, and macOS**. Manage SSH co
   - Switch tabs while open connections and their terminal buffers stay active in the background.
   - Change the font size, clear the screen, or reconnect from the toolbar.
 
+- 🔀 **SSH tunnels**
+  - Forward a local TCP port through a registered SSH server to a private service.
+  - Manage each tunnel independently of terminal tabs, with optional startup and reconnect settings.
+  - Check the local listener status and the number of active TCP connections.
+
 - 🎨 **Responsive desktop interface**
   - Work in a dark Slate/Zinc theme with Indigo/Cyan accents.
   - Use the responsive sidebar to navigate, check the credential store status, and see how many terminals are active.
   - View metrics, frequently used shortcuts, and recent command executions on the dashboard.
+
+---
+
+## SSH host identity
+
+Servix verifies the server’s signed host key before authentication for connection tests, commands, terminals, and tunnels. On first contact, compare the displayed algorithm and full OpenSSH `SHA256:` fingerprint with a value from a trusted source. Select **Trust this key** only after checking the fingerprint. Existing saved servers also require confirmation on their next connection.
+
+Servix pins one negotiated algorithm and fingerprint per normalized hostname and SSH port. DNS names are compared without case or a final dot. IP literals are canonicalized, and DNS aliases and IP addresses have separate trust records. If a server offers multiple keys, Servix pins the one negotiated during verification. A different key or negotiated algorithm requires review, even when both keys are legitimate.
+
+If a key changes, Servix blocks the connection and displays the previous and presented identities. For a planned rotation, verify the new fingerprint with the server administrator, choose **Review replacement**, and explicitly confirm **Replace trusted key**. Start a fresh connection afterward. A change during an established connection’s key exchange also terminates the connection. Start a fresh connection to review that key. Servix retains trust records when you delete a server registration, so recreating a registration uses the endpoint’s existing trust decision.
+
+## Tunnel to a private RDS MySQL instance
+
+1. In **Servers**, add the EC2 instance that can reach the private RDS endpoint. Use the EC2 SSH username and credentials.
+2. In **Tunnels**, choose **New tunnel**, give it a name and select the EC2 server. Set **Remote host** to the RDS endpoint, **Remote port** to `3306`, and **Local port** to `3307`.
+3. Save and start the tunnel. When prompted, compare the EC2 host key fingerprint with a trusted value and confirm it.
+4. In DBeaver, create a MySQL connection to `127.0.0.1:3307` with the RDS database credentials. Use the copy button in Servix to copy the local endpoint. The EC2 instance must be able to resolve and reach the RDS endpoint, and its SSH server must allow local port forwarding.
+
+The bind address is always IPv4 loopback. A tunnel listens locally after SSH authentication and creates a separate SSH channel for each incoming TCP connection. **Listening locally** reports the state of that listener. Servix reports destination or forwarding failures after a client attempts to connect. A tunnel accepts up to 128 active or pending TCP connections at a time.
+
+Both automatic settings are off for a new tunnel. **Connect at startup** opens the tunnel after the app is ready to display trust prompts and use the system vault. **Reconnect automatically** retries connectivity failures with delays up to 30 seconds and stops on authentication, trust, or local bind failures. After reconnection, clients must open new TCP connections. Stop a tunnel before editing it. Delete or reassign its tunnels before deleting an SSH server.
+
+Tunnels carry TCP traffic. The SSH tunnel encrypts transport to the SSH server. Configure the destination protocol’s TLS independently when needed.
 
 ---
 
@@ -43,7 +71,7 @@ Servix follows Clean Architecture. Dependencies point toward the domain layer.
 | **Presentation and state** | `signals_flutter` | Reactive state management |
 | **Embedded terminal** | `xterm` | ANSI/VT100 rendering and terminal scrollback |
 | **SSH protocol** | `dartssh2` | Dart SSH-2 client with password and private-key authentication, PTY allocation, and streaming |
-| **Local persistence** | `drift` + `sqlite3` | Typed relational storage for hosts, shortcuts, and execution history |
+| **Local persistence** | `drift` + `sqlite3` | Typed storage for hosts, shortcuts, execution history, tunnel configurations, and trusted host keys |
 | **Credential storage** | `flutter_secure_storage` | Secret Service on Linux, Keychain on macOS, and Credential Manager on Windows |
 | **Dependency injection** | `get_it` | Service locator |
 | **File picker** | `file_selector` | Native dialog for selecting SSH private keys |
@@ -64,7 +92,9 @@ lib/
 │   ├── datasources/
 │   │   ├── local_database.dart            # Drift tables and SQLite setup
 │   │   ├── secure_storage_datasource.dart # System credential storage
-│   │   └── ssh_remote_datasource.dart     # SSH connections, commands, and PTY sessions
+│   │   ├── ssh_connection_factory.dart   # Authentication and host verification
+│   │   ├── ssh_remote_datasource.dart     # Commands and PTY sessions
+│   │   └── ssh_tunnel_datasource.dart     # TCP forwarding and tunnel lifecycle
 │   ├── models/                            # Data transfer objects and entity mappings
 │   └── repositories/                      # Repository implementations
 ├── domain/
@@ -78,7 +108,8 @@ lib/
     │   ├── dashboard_view.dart            # Metrics, quick actions, and recent executions
     │   ├── hosts_view.dart                # Server list and details
     │   ├── shortcuts_view.dart            # Command shortcuts
-    │   └── terminal_view.dart             # Tabbed terminal emulator
+    │   ├── terminal_view.dart             # Tabbed terminal emulator
+    │   └── tunnels_view.dart              # Tunnel management
     └── widgets/                           # Reusable components and dialogs
 ```
 
@@ -214,3 +245,13 @@ On x64, the executable is at `build/linux/x64/release/bundle/servix`. Keep it in
 ## 📝 License
 
 Distributed under the MIT License.
+
+### SSH and tunnel integration tests
+
+Run `flutter test` for the standard suite, including migration and tunnel lifecycle coverage. To exercise a temporary OpenSSH server on Linux, install `sshd` and `ssh-keygen` and run the following command.
+
+```bash
+flutter test --dart-define=SERVIX_OPENSSH_TESTS=true test/ssh_openssh_integration_test.dart
+```
+
+The test uses the current local account and disposable Ed25519 keys on loopback. Set `SERVIX_SSHD` to the absolute executable path if `/usr/bin/sshd` is unavailable. Native quit handling, vault access, and client connectivity can also be checked by starting a tunnel with a desktop client and quitting Servix on each target platform.
