@@ -108,20 +108,20 @@ sudo apt install -y libsecret-1-dev
 sudo pacman -S libsecret
 ```
 
-Add Flutter to your `PATH` and install the Linux build dependencies (Clang, CMake, Ninja, pkg-config, and GTK 3 development files). Run the installer from the repository root.
+Add Flutter to your `PATH` and install the Linux build dependencies (Clang, CMake, Ninja, pkg-config, and GTK 3 development files). The Linux scripts also use `flock` from util-linux. Run the installer from the repository root.
 
 ```bash
-./install.sh
+./scripts/install-linux.sh
 ```
 
-The script builds the release bundle, installs it for your user, and adds **Servix** to the application menu. It uses `$XDG_DATA_HOME` or defaults to `~/.local/share`, with no `sudo` required. Run the same command after updating the source code to replace the installed version. If you previously installed ControlPanel, the script archives its old launcher.
+The script builds the release bundle, installs it in `$XDG_DATA_HOME/com.servix.Servix/bundle`, and adds **Servix** to the application menu. The data directory defaults to `~/.local/share`. Run the same command after updating the source code to replace the installed version. If you previously installed ControlPanel, the script archives its old launcher.
 
 ### Install on Windows
 
 Install Flutter and Visual Studio with the *Desktop development with C++* workload. From the repository root, run the installer in PowerShell. [Flutter setup for Windows](https://docs.flutter.dev/platform-integration/windows/setup)
 
 ```powershell
-.\install-windows.ps1
+.\scripts\install-windows.ps1
 ```
 
 The installer builds the release bundle, copies it to `%LOCALAPPDATA%\Programs\Servix`, and adds **Servix** to the Start menu. Close Servix before running the script again to update it.
@@ -131,10 +131,34 @@ The installer builds the release bundle, copies it to `%LOCALAPPDATA%\Programs\S
 On a Mac with Flutter, Xcode configured, and CocoaPods installed, run the installer from the repository root. [Flutter setup for macOS](https://docs.flutter.dev/platform-integration/macos/setup)
 
 ```bash
-./install-macos.sh
+./scripts/install-macos.sh
 ```
 
 The installer builds the release app and copies **Servix.app** to `~/Applications`. Open it from Finder. The local build can reopen saved SSH key paths across sessions using your account's file permissions. Distribution signing and notarization require separate setup.
+
+### Uninstall Servix
+
+Close Servix, then run the script for your platform from the repository root with the same user account you used to install it. On Linux, use the same `XDG_DATA_HOME` setting. Run the scripts with your regular user privileges. Uninstalling does not require Flutter.
+
+**Linux**
+
+```bash
+./scripts/uninstall-linux.sh
+```
+
+**Windows (PowerShell)**
+
+```powershell
+.\scripts\uninstall-windows.ps1
+```
+
+**macOS**
+
+```bash
+./scripts/uninstall-macos.sh
+```
+
+The scripts remove the installed app and its application menu entry on Linux or Start menu shortcut on Windows. Saved hosts, command shortcuts, execution history, and credentials remain available when you reinstall Servix.
 
 ### Data from Previous Versions
 

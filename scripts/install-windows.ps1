@@ -6,7 +6,7 @@ if ($env:OS -ne 'Windows_NT') {
 }
 Get-Command flutter -ErrorAction Stop | Out-Null
 
-Push-Location -LiteralPath $PSScriptRoot
+Push-Location -LiteralPath (Split-Path -Parent $PSScriptRoot)
 try {
     flutter --no-color build windows --release | Tee-Object -Variable buildOutput
     if ($LASTEXITCODE -ne 0) {

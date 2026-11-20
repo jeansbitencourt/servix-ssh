@@ -11,7 +11,7 @@ die() {
 command -v flutter >/dev/null || die 'Instale o Flutter e adicione-o ao PATH.'
 xcode-select -p >/dev/null || die 'Configure o Xcode antes de compilar.'
 
-cd -- "$(dirname -- "${BASH_SOURCE[0]}")"
+cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.."
 install_dir="$HOME/Applications"
 installed_app="$install_dir/Servix.app"
 bundle_id=com.servix.Servix

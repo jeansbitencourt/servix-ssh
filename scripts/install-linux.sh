@@ -11,7 +11,7 @@ die() {
 command -v flutter >/dev/null || die 'Instale o Flutter e adicione-o ao PATH.'
 command -v flock >/dev/null || die 'Instale o util-linux para usar o instalador.'
 
-cd -- "$(dirname -- "${BASH_SOURCE[0]}")"
+cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.."
 app_id=com.servix.Servix
 binary_name=servix
 icon_asset=data/flutter_assets/assets/branding/servix-icon.png
