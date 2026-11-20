@@ -4,6 +4,7 @@ import 'package:signals_flutter/signals_flutter.dart';
 import '../../core/theme/app_theme.dart';
 import '../../domain/entities/shortcut_command.dart';
 import '../../domain/entities/ssh_host.dart';
+import '../../l10n/app_localizations.dart';
 import '../stores/host_store.dart';
 import '../stores/shortcut_store.dart';
 import '../widgets/command_output_modal.dart';
@@ -29,10 +30,11 @@ class _ShortcutsViewState extends State<ShortcutsView> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return SignalBuilder(
       builder: (context) {
         final shortcuts = widget.shortcutStore.filteredShortcuts.value;
-        final categories = widget.shortcutStore.categories.value;
+        final categories = [null, ...widget.shortcutStore.categories.value];
         final selectedCategory = widget.shortcutStore.categoryFilter.value;
         final hosts = widget.hostStore.hosts.value;
 
@@ -82,8 +84,8 @@ class _ShortcutsViewState extends State<ShortcutsView> {
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    const Text(
-                                      'Atalhos de Comandos Remotos',
+                                    Text(
+                                      l10n.remoteCommandShortcuts,
                                       style: TextStyle(
                                         fontSize: 24,
                                         fontWeight: FontWeight.bold,
@@ -92,7 +94,7 @@ class _ShortcutsViewState extends State<ShortcutsView> {
                                     ),
                                     const SizedBox(height: 4),
                                     Text(
-                                      'Execute comandos de diagnóstico, deploys e manutenção remotamente em 1 clique.',
+                                      l10n.remoteCommandShortcutsDescription,
                                       style: TextStyle(
                                         fontSize: 14,
                                         color: Colors.grey[400],
@@ -122,8 +124,8 @@ class _ShortcutsViewState extends State<ShortcutsView> {
                                         color: AppTheme.accent,
                                       ),
                                       const SizedBox(width: 8),
-                                      const Text(
-                                        'Alvo: ',
+                                      Text(
+                                        l10n.targetServer,
                                         style: TextStyle(
                                           fontSize: 12,
                                           color: Color(0xFF94A3B8),
@@ -135,8 +137,8 @@ class _ShortcutsViewState extends State<ShortcutsView> {
                                             isExpanded: true,
                                             value: effectiveTarget,
                                             dropdownColor: AppTheme.darkSurface,
-                                            hint: const Text(
-                                              'Selecione um Servidor',
+                                            hint: Text(
+                                              l10n.pickServer,
                                               style: TextStyle(fontSize: 13),
                                             ),
                                             items: hosts
@@ -180,7 +182,7 @@ class _ShortcutsViewState extends State<ShortcutsView> {
                                     );
                                   },
                                   icon: const Icon(Icons.add_rounded, size: 18),
-                                  label: const Text('Novo Atalho'),
+                                  label: Text(l10n.newShortcut),
                                 ),
                               ],
                             ),
@@ -195,7 +197,7 @@ class _ShortcutsViewState extends State<ShortcutsView> {
                                   return Padding(
                                     padding: const EdgeInsets.only(right: 8),
                                     child: ChoiceChip(
-                                      label: Text(cat),
+                                      label: Text(cat ?? l10n.allCategories),
                                       selected: isSelected,
                                       onSelected: (_) =>
                                           widget
@@ -245,8 +247,8 @@ class _ShortcutsViewState extends State<ShortcutsView> {
                                     color: Colors.grey[600],
                                   ),
                                   const SizedBox(height: 16),
-                                  const Text(
-                                    'Nenhum atalho encontrado para esta categoria',
+                                  Text(
+                                    l10n.noShortcutsInCategory,
                                     style: TextStyle(
                                       color: Color(0xFF94A3B8),
                                       fontSize: 15,
@@ -264,9 +266,7 @@ class _ShortcutsViewState extends State<ShortcutsView> {
                                       );
                                     },
                                     icon: const Icon(Icons.add, size: 16),
-                                    label: const Text(
-                                      'Cadastrar Primeiro Atalho',
-                                    ),
+                                    label: Text(l10n.addFirstShortcut),
                                   ),
                                 ],
                               ),
@@ -293,9 +293,9 @@ class _ShortcutsViewState extends State<ShortcutsView> {
                                     if (effectiveTarget == null) {
                                       ScaffoldMessenger.of(context)
                                           .showSnackBar(
-                                            const SnackBar(
+                                            SnackBar(
                                               content: Text(
-                                                'Cadastre ou selecione um servidor alvo para executar o comando!',
+                                                l10n.targetServerRequired,
                                               ),
                                               backgroundColor: AppTheme.warning,
                                             ),
@@ -354,17 +354,16 @@ class _ShortcutsViewState extends State<ShortcutsView> {
   }
 
   void _confirmDelete(BuildContext context, ShortcutCommand shortcut) {
+    final l10n = AppLocalizations.of(context);
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Excluir Atalho?'),
-        content: Text(
-          'Tem certeza que deseja remover o atalho "${shortcut.name}"?',
-        ),
+        title: Text(l10n.deleteShortcutTitle),
+        content: Text(l10n.deleteShortcutConfirmation(shortcut.name)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('Cancelar'),
+            child: Text(l10n.cancel),
           ),
           ElevatedButton(
             onPressed: () {
@@ -372,7 +371,7 @@ class _ShortcutsViewState extends State<ShortcutsView> {
               widget.shortcutStore.deleteShortcut(shortcut.id);
             },
             style: ElevatedButton.styleFrom(backgroundColor: AppTheme.error),
-            child: const Text('Excluir'),
+            child: Text(l10n.delete),
           ),
         ],
       ),

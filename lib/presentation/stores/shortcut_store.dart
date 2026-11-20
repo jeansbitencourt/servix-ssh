@@ -1,5 +1,9 @@
+import '../../l10n/system_localizations.dart';
+
 import 'dart:async';
+
 import 'package:signals_flutter/signals_flutter.dart';
+
 import '../../domain/entities/command_result.dart';
 import '../../domain/entities/shortcut_command.dart';
 import '../../domain/entities/ssh_host.dart';
@@ -20,16 +24,17 @@ class ShortcutStore {
   final executionHistory = signal<List<CommandResult>>([]);
   final lastResult = signal<CommandResult?>(null);
   final isOutputModalVisible = signal<bool>(false);
-  final categoryFilter = signal<String>('Todas');
+  final categoryFilter = signal<String?>(null);
 
   late final categories = computed<List<String>>(() {
-    final unique = shortcuts.value.map((s) => s.category).toSet().toList()..sort();
-    return ['Todas', ...unique];
+    final unique = shortcuts.value.map((s) => s.category).toSet().toList()
+      ..sort();
+    return unique;
   });
 
   late final filteredShortcuts = computed<List<ShortcutCommand>>(() {
     final filter = categoryFilter.value;
-    if (filter == 'Todas') {
+    if (filter == null) {
       return shortcuts.value;
     }
     return shortcuts.value.where((s) => s.category == filter).toList();
@@ -37,20 +42,25 @@ class ShortcutStore {
 
   void init() {
     _shortcutsSubscription?.cancel();
-    _shortcutsSubscription = _shortcutRepository.watchShortcuts().listen((list) {
+    _shortcutsSubscription = _shortcutRepository.watchShortcuts().listen((
+      list,
+    ) {
       shortcuts.value = list;
     });
 
     _historySubscription?.cancel();
-    _historySubscription = _shortcutRepository.watchExecutionHistory(limit: 50).listen((list) {
-      executionHistory.value = list;
-    });
+    _historySubscription = _shortcutRepository
+        .watchExecutionHistory(limit: 50)
+        .listen((list) {
+          executionHistory.value = list;
+        });
   }
 
   bool isShortcutRunning(String id) => runningShortcutIds.value.contains(id);
 
   Future<CommandResult?> execute(ShortcutCommand shortcut, SSHHost host) async {
-    final updatedSet = Set<String>.from(runningShortcutIds.value)..add(shortcut.id);
+    final updatedSet = Set<String>.from(runningShortcutIds.value)
+      ..add(shortcut.id);
     runningShortcutIds.value = updatedSet;
 
     try {
@@ -69,7 +79,7 @@ class ShortcutStore {
         command: shortcut.command,
         exitCode: 1,
         stdout: '',
-        stderr: 'Falha na execução: $e',
+        stderr: systemLocalizations.commandFailed(e.toString()),
         durationMs: 0,
         executedAt: DateTime.now(),
       );
@@ -77,14 +87,17 @@ class ShortcutStore {
       isOutputModalVisible.value = true;
       return errorResult;
     } finally {
-      final finalSet = Set<String>.from(runningShortcutIds.value)..remove(shortcut.id);
+      final finalSet = Set<String>.from(runningShortcutIds.value)
+        ..remove(shortcut.id);
       runningShortcutIds.value = finalSet;
     }
   }
 
-  Future<void> saveShortcut(ShortcutCommand shortcut) => _shortcutRepository.saveShortcut(shortcut);
+  Future<void> saveShortcut(ShortcutCommand shortcut) =>
+      _shortcutRepository.saveShortcut(shortcut);
 
-  Future<void> deleteShortcut(String id) => _shortcutRepository.deleteShortcut(id);
+  Future<void> deleteShortcut(String id) =>
+      _shortcutRepository.deleteShortcut(id);
 
   void closeOutputModal() {
     isOutputModalVisible.value = false;

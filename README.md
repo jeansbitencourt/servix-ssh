@@ -146,6 +146,12 @@ Servix uses a new database, `servix.sqlite`, in the application's support direct
 flutter pub get
 ```
 
+### Edit App Translations
+
+Servix follows the operating system’s preferred languages and falls back to English. Edit the English messages in `lib/l10n/app_en.arb` and the Brazilian Portuguese messages in `lib/l10n/app_pt.arb`. The `app_pt_BR.arb` bundle declares the regional locale and inherits the Portuguese messages.
+
+Run `flutter gen-l10n` after editing the catalogs. `flutter pub get` also generates the localization classes.
+
 ### Regenerate Drift Code After Schema Changes
 
 ```bash

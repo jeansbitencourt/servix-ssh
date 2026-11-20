@@ -1,0 +1,380 @@
+{
+  "@@locale": "en",
+  "dashboard": "Dashboard",
+  "servers": "Servers",
+  "shortcuts": "Shortcuts",
+  "terminals": "Terminals",
+  "macosKeychain": "macOS Keychain",
+  "windowsCredentials": "Windows Credentials",
+  "systemVault": "System vault",
+  "vaultActive": "Vault Active",
+  "close": "Close",
+  "cancel": "Cancel",
+  "delete": "Delete",
+  "edit": "Edit",
+  "runCommand": "Run",
+  "runningCommand": "Running...",
+  "openTerminal": "Open Terminal",
+  "testConnection": "Test Connection",
+  "saveChanges": "Save Changes",
+  "password": "Password",
+  "sshKey": "SSH Key",
+  "nameRequired": "Name is required",
+  "hostSearchHint": "Search by name, host, or username...",
+  "noServersFound": "No servers found",
+  "addNewServer": "Add New Server",
+  "selectServerToInspect": "Select a server from the list to view its details",
+  "backToList": "Back to list",
+  "checkSshConnectivity": "Check SSH connectivity using the port and credentials.",
+  "accessParameters": "Access Details",
+  "hostAddress": "Host Address",
+  "sshPort": "SSH Port",
+  "username": "Username",
+  "authenticationType": "Authentication Type",
+  "privateKeyType": "Private Key (Ed25519/RSA)",
+  "keyringPassword": "Password (Stored in Keyring)",
+  "keyFile": "Key File",
+  "addedOn": "Added on",
+  "serverShortcuts": "Command Shortcuts for This Server",
+  "noServerShortcuts": "No shortcuts configured for this server.",
+  "deleteServerTitle": "Delete Server?",
+  "selectKey": "Select key",
+  "filePickerError": "Could not open the file picker",
+  "enterKeyPathInstead": "You can enter the private key path in the form.",
+  "editSshConnection": "Edit SSH Connection",
+  "newSshConnection": "New SSH Connection",
+  "editSshConnectionDescription": "Update the server details and credentials",
+  "newSshConnectionDescription": "Set up server access details and credentials",
+  "serverNameField": "Server Name *",
+  "serverNameHint": "e.g. Production VPS 01",
+  "serverGroupField": "Group / Tag",
+  "serverGroupHint": "e.g. Production",
+  "hostField": "Host / IP *",
+  "hostHint": "e.g. 192.168.1.100 or vps.example.com",
+  "hostRequired": "Host is required",
+  "portField": "Port",
+  "invalidPort": "Invalid port",
+  "sshUsernameField": "SSH Username *",
+  "sshUsernameHint": "e.g. root, ubuntu",
+  "usernameRequired": "Username is required",
+  "privateKeyAuthentication": "Private Key (SSH Key)",
+  "newPasswordField": "New Password (leave blank to keep current)",
+  "sshPasswordField": "SSH Password *",
+  "passwordRequired": "Password is required for new connections",
+  "privateKeyPathField": "Private Key File Path *",
+  "privateKeyPathHint": "/home/user/.ssh/id_rsa or id_ed25519",
+  "keyPathRequired": "Key file path is required",
+  "browseFiles": "Browse...",
+  "keyPassphraseField": "Key Passphrase (optional)",
+  "keyPassphraseHint": "Leave blank if the key is unencrypted",
+  "connectionTestSucceeded": "SSH connection successful!",
+  "addServer": "Add Server",
+  "remoteCommandShortcuts": "Remote Command Shortcuts",
+  "remoteCommandShortcutsDescription": "Run diagnostic, deployment, and maintenance commands remotely with one click.",
+  "targetServer": "Target: ",
+  "pickServer": "Select a Server",
+  "selectServerTitle": "Select Server",
+  "newShortcut": "New Shortcut",
+  "noShortcutsInCategory": "No shortcuts found in this category",
+  "addFirstShortcut": "Add First Shortcut",
+  "targetServerRequired": "Add or select a target server to run the command.",
+  "deleteShortcutTitle": "Delete Shortcut?",
+  "editCommandShortcut": "Edit Command Shortcut",
+  "newCommandShortcut": "New Command Shortcut",
+  "editShortcutDescription": "Update the command and its options",
+  "newShortcutDescription": "Set up a command to run remotely with one click",
+  "shortcutNameField": "Shortcut Name *",
+  "shortcutNameHint": "e.g. Check Disk Usage",
+  "categoryField": "Category",
+  "categoryHint": "e.g. System, Docker",
+  "remoteCommandField": "Remote Command *",
+  "remoteCommandHint": "e.g. df -h && free -m",
+  "commandRequired": "Command is required",
+  "workingDirectoryField": "Working Directory (optional)",
+  "workingDirectoryHint": "e.g. /var/www/my-app",
+  "timeoutField": "Timeout (s)",
+  "invalidTimeout": "Invalid timeout",
+  "serverBinding": "Server Assignment",
+  "globalShortcut": "Global (Available on any server)",
+  "generalCategory": "General",
+  "createShortcut": "Create Shortcut",
+  "editShortcut": "Edit Shortcut",
+  "deleteShortcut": "Delete Shortcut",
+  "noOpenTerminals": "No Open Terminals",
+  "openTerminalDescription": "Open an interactive SSH session to run commands on the server.",
+  "startSshSession": "Start SSH Session",
+  "newSshSession": "New SSH Session",
+  "serverRequiredForTerminal": "Add at least one server before opening a terminal.",
+  "connectToServer": "Connect to Server",
+  "terminalConnected": "Connected",
+  "terminalConnecting": "Connecting…",
+  "terminalDisconnected": "Disconnected",
+  "terminalError": "Error",
+  "decreaseFontSize": "Decrease Font Size",
+  "increaseFontSize": "Increase Font Size",
+  "terminalActions": "Terminal actions",
+  "clearScreen": "Clear Screen",
+  "reconnect": "Reconnect",
+  "closeTerminal": "Close Terminal",
+  "quickActions": "One-Click Actions",
+  "viewAll": "View All",
+  "noShortcutsYet": "No shortcuts yet.",
+  "quickAccess": "Quick Access",
+  "noServersYet": "No servers yet.",
+  "dashboardTitle": "SSH Dashboard",
+  "dashboardDescription": "Manage connections, monitor servers, and run shortcuts with one click.",
+  "newServer": "New Server",
+  "registeredServers": "Registered Servers",
+  "configuredShortcuts": "Configured Shortcuts",
+  "activeTerminals": "Active Terminals",
+  "recordedExecutions": "Recorded Runs",
+  "recentExecutions": "Recent Command Runs",
+  "noExecutionsYet": "No commands have been run yet.",
+  "commandResultTitle": "Command Result",
+  "exitCodeSuccess": "Exit Code 0 (Success)",
+  "outputCopied": "Output copied to the clipboard!",
+  "copyOutput": "Copy Output",
+  "runAgain": "Run Again",
+  "noCommandOutput": "[The command completed successfully without producing output]",
+  "appTitle": "Servix — SSH Operations Center",
+  "appSlogan": "SSH Operations Center",
+  "allGroups": "All",
+  "allCategories": "All",
+  "defaultGroup": "Default",
+  "connectionTestReturnedFalse": "SSH connection failed",
+  "terminalConnectionSucceeded": "Connected successfully!",
+  "remoteSessionClosed": "The remote server closed the SSH session.",
+  "missingKeyPath": "No private key file path was provided",
+  "seedUptime": "Uptime and System Load",
+  "seedMemory": "RAM Usage",
+  "seedDisk": "Disk Space",
+  "seedDocker": "Running Docker Containers",
+  "seedSyslog": "Last 50 Syslog Lines",
+  "seedSystemCategory": "System",
+  "vaultStatus": "Vault Active · {vaultName}",
+  "@vaultStatus": {
+    "placeholders": {
+      "vaultName": {
+        "type": "String"
+      }
+    }
+  },
+  "deleteServerConfirmation": "Delete \"{name}\" and its saved credentials?",
+  "@deleteServerConfirmation": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "deleteShortcutConfirmation": "Delete the shortcut \"{name}\"?",
+  "@deleteShortcutConfirmation": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "availableShortcuts": "{count, plural, one{1 available} other{{count} available}}",
+  "@availableShortcuts": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "executedAt": "Run on {date}",
+  "@executedAt": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "exitCodeError": "Exit Code {code} (Error)",
+  "@exitCodeError": {
+    "placeholders": {
+      "code": {
+        "type": "int"
+      }
+    }
+  },
+  "exitStatus": "Exit {code}",
+  "@exitStatus": {
+    "placeholders": {
+      "code": {
+        "type": "int"
+      }
+    }
+  },
+  "commandOutputSummary": "Command: {command}\nStatus: Exit {code}\nDuration: {duration}\n\n--- STDOUT ---\n{stdout}\n--- STDERR ---\n{stderr}",
+  "@commandOutputSummary": {
+    "placeholders": {
+      "command": {
+        "type": "String"
+      },
+      "code": {
+        "type": "int"
+      },
+      "duration": {
+        "type": "String"
+      },
+      "stdout": {
+        "type": "String"
+      },
+      "stderr": {
+        "type": "String"
+      }
+    }
+  },
+  "connectionFailed": "Connection failed: {error}",
+  "@connectionFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "commandFailed": "Execution failed: {error}",
+  "@commandFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "privateKeyNotFound": "Private key file not found: {path}",
+  "@privateKeyNotFound": {
+    "placeholders": {
+      "path": {
+        "type": "String"
+      }
+    }
+  },
+  "privateKeyReadFailed": "Could not read the private key. Check the passphrase. ({error})",
+  "@privateKeyReadFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "sshSocketFailed": "Could not connect to {address}: {error}",
+  "@sshSocketFailed": {
+    "placeholders": {
+      "address": {
+        "type": "String"
+      },
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "sshConnectionTimedOut": "Connection to {address} timed out",
+  "@sshConnectionTimedOut": {
+    "placeholders": {
+      "address": {
+        "type": "String"
+      }
+    }
+  },
+  "sshConnectionError": "SSH connection to {host} failed: {error}",
+  "@sshConnectionError": {
+    "placeholders": {
+      "host": {
+        "type": "String"
+      },
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "commandTimedOut": "Command timed out after {seconds}s",
+  "@commandTimedOut": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "sshCommandFailed": "Could not run the command: {error}",
+  "@sshCommandFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "terminalConnectingTo": "Connecting to {address}...",
+  "@terminalConnectingTo": {
+    "placeholders": {
+      "address": {
+        "type": "String"
+      }
+    }
+  },
+  "terminalReadError": "Read error: {error}",
+  "@terminalReadError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "terminalDisconnectedWithError": "Session disconnected with an error: {error}",
+  "@terminalDisconnectedWithError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "savePasswordFailed": "Could not save the password in secure storage: {error}",
+  "@savePasswordFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "savePassphraseFailed": "Could not save the passphrase in secure storage: {error}",
+  "@savePassphraseFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "readPasswordFailed": "Could not read the password in secure storage: {error}",
+  "@readPasswordFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "readPassphraseFailed": "Could not read the passphrase in secure storage: {error}",
+  "@readPassphraseFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "deletePasswordFailed": "Could not delete the password in secure storage: {error}",
+  "@deletePasswordFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "deletePassphraseFailed": "Could not delete the passphrase in secure storage: {error}",
+  "@deletePassphraseFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  }
+}

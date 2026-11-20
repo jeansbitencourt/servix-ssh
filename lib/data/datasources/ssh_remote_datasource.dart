@@ -11,6 +11,7 @@ import '../../core/errors/exceptions.dart';
 import '../../domain/entities/command_result.dart';
 import '../../domain/entities/ssh_host.dart';
 import '../../domain/entities/terminal_session.dart';
+import '../../l10n/system_localizations.dart';
 
 class SSHRemoteDatasource {
   final Uuid _uuid;
@@ -33,38 +34,57 @@ class SSHRemoteDatasource {
       List<SSHKeyPair>? identities;
       if (host.authType == SSHAuthType.privateKey) {
         if (host.keyFilePath == null || host.keyFilePath!.trim().isEmpty) {
-          throw SSHAuthenticationException('Caminho do arquivo de chave privada não fornecido');
+          throw SSHAuthenticationException(systemLocalizations.missingKeyPath);
         }
 
         final keyFile = File(host.keyFilePath!);
         if (!keyFile.existsSync()) {
-          throw SSHAuthenticationException('Arquivo de chave privada não encontrado: ${host.keyFilePath}');
+          throw SSHAuthenticationException(
+            systemLocalizations.privateKeyNotFound(keyFile.path),
+          );
         }
 
         final keyPem = await keyFile.readAsString();
         try {
           identities = SSHKeyPair.fromPem(keyPem, passphrase);
         } catch (e) {
-          throw SSHAuthenticationException('Falha ao processar chave privada (passphrase incorreta?): $e', e);
+          throw SSHAuthenticationException(
+            systemLocalizations.privateKeyReadFailed(e.toString()),
+            e,
+          );
         }
       }
 
       final client = SSHClient(
         socket,
         username: host.username,
-        onPasswordRequest: host.authType == SSHAuthType.password ? () => password ?? '' : null,
+        onPasswordRequest: host.authType == SSHAuthType.password
+            ? () => password ?? ''
+            : null,
         identities: identities,
       );
 
       await client.authenticated;
       return client;
     } on SocketException catch (e) {
-      throw SSHConnectionException('Não foi possível conectar ao host ${host.host}:${host.port}: ${e.message}', e);
+      throw SSHConnectionException(
+        systemLocalizations.sshSocketFailed(
+          '${host.host}:${host.port}',
+          e.message,
+        ),
+        e,
+      );
     } on TimeoutException catch (e) {
-      throw SSHConnectionException('Tempo esgotado ao conectar ao host ${host.host}:${host.port}', e);
+      throw SSHConnectionException(
+        systemLocalizations.sshConnectionTimedOut('${host.host}:${host.port}'),
+        e,
+      );
     } catch (e) {
       if (e is AppException) rethrow;
-      throw SSHConnectionException('Erro durante conexão SSH com ${host.host}: $e', e);
+      throw SSHConnectionException(
+        systemLocalizations.sshConnectionError(host.host, e.toString()),
+        e,
+      );
     }
   }
 
@@ -108,9 +128,13 @@ class SSHRemoteDatasource {
         timeout: const Duration(seconds: 15),
       );
 
-      final session = await client.execute(command).timeout(
+      final session = await client
+          .execute(command)
+          .timeout(
             Duration(seconds: timeoutSeconds),
-            onTimeout: () => throw SSHExecutionException('Comando expirou após ${timeoutSeconds}s'),
+            onTimeout: () => throw SSHExecutionException(
+              systemLocalizations.commandTimedOut(timeoutSeconds),
+            ),
           );
 
       final stdoutBuffer = StringBuffer();
@@ -145,7 +169,10 @@ class SSHRemoteDatasource {
     } catch (e) {
       stopwatch.stop();
       if (e is AppException) rethrow;
-      throw SSHExecutionException('Falha na execução do comando: $e', details: e);
+      throw SSHExecutionException(
+        systemLocalizations.sshCommandFailed(e.toString()),
+        details: e,
+      );
     } finally {
       try {
         client?.close();
@@ -171,7 +198,9 @@ class SSHRemoteDatasource {
     );
 
     try {
-      terminal.write('Conectando a ${host.username}@${host.host}:${host.port}...\r\n');
+      terminal.write(
+        '${systemLocalizations.terminalConnectingTo('${host.username}@${host.host}:${host.port}')}\r\n',
+      );
 
       final client = await _connectClient(
         host,
@@ -192,7 +221,9 @@ class SSHRemoteDatasource {
 
       session.sshSession = sshSession;
       session.status = TerminalSessionStatus.connected;
-      terminal.write('\x1b[32mConectado com sucesso!\x1b[0m\r\n\r\n');
+      terminal.write(
+        '\x1b[32m${systemLocalizations.terminalConnectionSucceeded}\x1b[0m\r\n\r\n',
+      );
 
       // Pipe SSH stdout & stderr to Terminal
       sshSession.stdout.listen(
@@ -200,15 +231,15 @@ class SSHRemoteDatasource {
           terminal.write(utf8.decode(data, allowMalformed: true));
         },
         onError: (err) {
-          terminal.write('\r\n\x1b[31mErro de leitura: $err\x1b[0m\r\n');
+          terminal.write(
+            '\r\n\x1b[31m${systemLocalizations.terminalReadError(err.toString())}\x1b[0m\r\n',
+          );
         },
       );
 
-      sshSession.stderr.listen(
-        (data) {
-          terminal.write(utf8.decode(data, allowMalformed: true));
-        },
-      );
+      sshSession.stderr.listen((data) {
+        terminal.write(utf8.decode(data, allowMalformed: true));
+      });
 
       // Pipe Terminal input to SSH
       terminal.onOutput = (output) {
@@ -225,23 +256,31 @@ class SSHRemoteDatasource {
       };
 
       // Handle termination
-      sshSession.done.then((_) {
-        session.status = TerminalSessionStatus.disconnected;
-        terminal.write('\r\n\x1b[33mSessão SSH encerrada pelo servidor remoto.\x1b[0m\r\n');
-        try {
-          client.close();
-        } catch (_) {}
-      }).catchError((err) {
-        session.status = TerminalSessionStatus.error;
-        session.errorMessage = err.toString();
-        terminal.write('\r\n\x1b[31mSessão desconectada com erro: $err\x1b[0m\r\n');
-      });
+      sshSession.done
+          .then((_) {
+            session.status = TerminalSessionStatus.disconnected;
+            terminal.write(
+              '\r\n\x1b[33m${systemLocalizations.remoteSessionClosed}\x1b[0m\r\n',
+            );
+            try {
+              client.close();
+            } catch (_) {}
+          })
+          .catchError((err) {
+            session.status = TerminalSessionStatus.error;
+            session.errorMessage = err.toString();
+            terminal.write(
+              '\r\n\x1b[31m${systemLocalizations.terminalDisconnectedWithError(err.toString())}\x1b[0m\r\n',
+            );
+          });
 
       return session;
     } catch (e) {
       session.status = TerminalSessionStatus.error;
       session.errorMessage = e.toString();
-      terminal.write('\r\n\x1b[31mFalha na conexão: $e\x1b[0m\r\n');
+      terminal.write(
+        '\r\n\x1b[31m${systemLocalizations.connectionFailed(e.toString())}\x1b[0m\r\n',
+      );
       return session;
     }
   }

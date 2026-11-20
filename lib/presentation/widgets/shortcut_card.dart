@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../core/theme/app_theme.dart';
 import '../../domain/entities/shortcut_command.dart';
+import '../../l10n/app_localizations.dart';
 
 class ShortcutCard extends StatelessWidget {
   final ShortcutCommand shortcut;
@@ -21,6 +22,7 @@ class ShortcutCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -70,7 +72,7 @@ class ShortcutCard extends StatelessWidget {
                 splashRadius: 14,
                 padding: EdgeInsets.zero,
                 constraints: const BoxConstraints(),
-                tooltip: 'Editar Atalho',
+                tooltip: l10n.editShortcut,
               ),
               const SizedBox(width: 8),
               IconButton(
@@ -83,7 +85,7 @@ class ShortcutCard extends StatelessWidget {
                 splashRadius: 14,
                 padding: EdgeInsets.zero,
                 constraints: const BoxConstraints(),
-                tooltip: 'Excluir Atalho',
+                tooltip: l10n.deleteShortcut,
               ),
             ],
           ),
@@ -171,7 +173,7 @@ class ShortcutCard extends StatelessWidget {
                         ),
                       )
                     : const Icon(Icons.play_arrow_rounded, size: 16),
-                label: Text(isRunning ? 'Executando...' : 'Executar'),
+                label: Text(isRunning ? l10n.runningCommand : l10n.runCommand),
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 14,

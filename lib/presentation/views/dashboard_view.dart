@@ -4,6 +4,7 @@ import 'package:signals_flutter/signals_flutter.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/utils/date_formatter.dart';
 import '../../domain/entities/ssh_host.dart';
+import '../../l10n/app_localizations.dart';
 import '../stores/host_store.dart';
 import '../stores/shortcut_store.dart';
 import '../stores/terminal_session_store.dart';
@@ -26,6 +27,7 @@ class DashboardView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return SignalBuilder(
       builder: (context) {
         final hosts = hostStore.hosts.value;
@@ -67,9 +69,9 @@ class DashboardView extends StatelessWidget {
                         size: 20,
                       ),
                       const SizedBox(width: 8),
-                      const Expanded(
+                      Expanded(
                         child: Text(
-                          'Ações Rápidas de 1 Clique',
+                          l10n.quickActions,
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
@@ -79,7 +81,7 @@ class DashboardView extends StatelessWidget {
                       ),
                       TextButton(
                         onPressed: () => onNavigateToTab(2),
-                        child: const Text('Ver Todos'),
+                        child: Text(l10n.viewAll),
                       ),
                     ],
                   ),
@@ -89,7 +91,7 @@ class DashboardView extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(vertical: 24),
                       child: Center(
                         child: Text(
-                          'Nenhum atalho cadastrado ainda.',
+                          l10n.noShortcutsYet,
                           style: TextStyle(color: Colors.grey[500]),
                         ),
                       ),
@@ -157,7 +159,7 @@ class DashboardView extends StatelessWidget {
                                         strokeWidth: 2,
                                       ),
                                     )
-                                  : const Text('Executar'),
+                                  : Text(l10n.runCommand),
                             ),
                           ],
                         );
@@ -184,9 +186,9 @@ class DashboardView extends StatelessWidget {
                         size: 20,
                       ),
                       const SizedBox(width: 8),
-                      const Expanded(
+                      Expanded(
                         child: Text(
-                          'Acesso Rápido',
+                          l10n.quickAccess,
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
@@ -196,7 +198,7 @@ class DashboardView extends StatelessWidget {
                       ),
                       TextButton(
                         onPressed: () => onNavigateToTab(1),
-                        child: const Text('Servidores'),
+                        child: Text(l10n.servers),
                       ),
                     ],
                   ),
@@ -206,7 +208,7 @@ class DashboardView extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(vertical: 24),
                       child: Center(
                         child: Text(
-                          'Nenhum servidor cadastrado.',
+                          l10n.noServersYet,
                           style: TextStyle(color: Colors.grey[500]),
                         ),
                       ),
@@ -254,7 +256,7 @@ class DashboardView extends StatelessWidget {
                                 size: 18,
                                 color: AppTheme.accent,
                               ),
-                              tooltip: 'Abrir Terminal',
+                              tooltip: l10n.openTerminal,
                             ),
                           ],
                         );
@@ -282,8 +284,8 @@ class DashboardView extends StatelessWidget {
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text(
-                                'Painel de Controle SSH',
+                              Text(
+                                l10n.dashboardTitle,
                                 style: TextStyle(
                                   fontSize: 24,
                                   fontWeight: FontWeight.bold,
@@ -292,7 +294,7 @@ class DashboardView extends StatelessWidget {
                               ),
                               const SizedBox(height: 4),
                               Text(
-                                'Gerencie conexões, monitore servidores e dispare atalhos rápidos com 1 clique.',
+                                l10n.dashboardDescription,
                                 style: TextStyle(
                                   fontSize: 14,
                                   color: Colors.grey[400],
@@ -309,7 +311,7 @@ class DashboardView extends StatelessWidget {
                               );
                             },
                             icon: const Icon(Icons.add_rounded, size: 18),
-                            label: const Text('Novo Servidor'),
+                            label: Text(l10n.newServer),
                           ),
                         ],
                       ),
@@ -323,7 +325,7 @@ class DashboardView extends StatelessWidget {
                           SizedBox(
                             width: metricWidth,
                             child: _buildMetricCard(
-                              title: 'Servidores Cadastrados',
+                              title: l10n.registeredServers,
                               value: hosts.length.toString(),
                               icon: Icons.dns_rounded,
                               color: AppTheme.primary,
@@ -333,7 +335,7 @@ class DashboardView extends StatelessWidget {
                           SizedBox(
                             width: metricWidth,
                             child: _buildMetricCard(
-                              title: 'Atalhos Configurados',
+                              title: l10n.configuredShortcuts,
                               value: shortcuts.length.toString(),
                               icon: Icons.flash_on_rounded,
                               color: AppTheme.accent,
@@ -343,7 +345,7 @@ class DashboardView extends StatelessWidget {
                           SizedBox(
                             width: metricWidth,
                             child: _buildMetricCard(
-                              title: 'Terminais Ativos',
+                              title: l10n.activeTerminals,
                               value: activeSessions.length.toString(),
                               icon: Icons.terminal_rounded,
                               color: AppTheme.success,
@@ -353,7 +355,7 @@ class DashboardView extends StatelessWidget {
                           SizedBox(
                             width: metricWidth,
                             child: _buildMetricCard(
-                              title: 'Execuções Registradas',
+                              title: l10n.recordedExecutions,
                               value: history.length.toString(),
                               icon: Icons.history_rounded,
                               color: AppTheme.warning,
@@ -391,8 +393,8 @@ class DashboardView extends StatelessWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text(
-                              'Histórico de Execuções Recentes',
+                            Text(
+                              l10n.recentExecutions,
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
@@ -407,7 +409,7 @@ class DashboardView extends StatelessWidget {
                                 ),
                                 child: Center(
                                   child: Text(
-                                    'Nenhum comando foi executado ainda.',
+                                    l10n.noExecutionsYet,
                                     style: TextStyle(color: Colors.grey[500]),
                                   ),
                                 ),
@@ -447,7 +449,7 @@ class DashboardView extends StatelessWidget {
                                           ),
                                         ),
                                         child: Text(
-                                          'Exit ${item.exitCode}',
+                                          l10n.exitStatus(item.exitCode),
                                           style: TextStyle(
                                             fontSize: 11,
                                             fontWeight: FontWeight.w600,
@@ -460,6 +462,7 @@ class DashboardView extends StatelessWidget {
                                       Text(
                                         DateFormatter.formatDuration(
                                           item.durationMs,
+                                          l10n.localeName,
                                         ),
                                         style: const TextStyle(
                                           fontSize: 12,
@@ -469,6 +472,7 @@ class DashboardView extends StatelessWidget {
                                       Text(
                                         DateFormatter.formatDateTime(
                                           item.executedAt,
+                                          l10n.localeName,
                                         ),
                                         style: const TextStyle(
                                           fontSize: 12,
@@ -563,7 +567,7 @@ class DashboardView extends StatelessWidget {
       showDialog(
         context: context,
         builder: (ctx) => SimpleDialog(
-          title: const Text('Selecionar Servidor'),
+          title: Text(AppLocalizations.of(ctx).selectServerTitle),
           children: hosts
               .map(
                 (h) => SimpleDialogOption(

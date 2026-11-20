@@ -4,6 +4,7 @@ import 'package:uuid/uuid.dart';
 import '../../core/theme/app_theme.dart';
 import '../../domain/entities/shortcut_command.dart';
 import '../../domain/entities/ssh_host.dart';
+import '../../l10n/app_localizations.dart';
 import '../stores/shortcut_store.dart';
 
 class ShortcutFormDialog extends StatefulWidget {
@@ -27,7 +28,8 @@ class _ShortcutFormDialogState extends State<ShortcutFormDialog> {
 
   late TextEditingController _nameController;
   late TextEditingController _commandController;
-  late TextEditingController _categoryController;
+  late final TextEditingController _categoryController;
+  bool _hasInitializedCategory = false;
   late TextEditingController _workDirController;
   late TextEditingController _timeoutController;
 
@@ -39,12 +41,23 @@ class _ShortcutFormDialogState extends State<ShortcutFormDialog> {
     final s = widget.shortcutToEdit;
     _nameController = TextEditingController(text: s?.name ?? '');
     _commandController = TextEditingController(text: s?.command ?? '');
-    _categoryController = TextEditingController(text: s?.category ?? 'Geral');
     _workDirController = TextEditingController(text: s?.workingDirectory ?? '');
     _timeoutController = TextEditingController(
       text: (s?.timeoutSeconds ?? 30).toString(),
     );
     _selectedHostId = s?.hostId;
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_hasInitializedCategory) return;
+
+    final l10n = AppLocalizations.of(context);
+    _categoryController = TextEditingController(
+      text: widget.shortcutToEdit?.category ?? l10n.generalCategory,
+    );
+    _hasInitializedCategory = true;
   }
 
   @override
@@ -59,6 +72,7 @@ class _ShortcutFormDialogState extends State<ShortcutFormDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final isEditing = widget.shortcutToEdit != null;
 
     final compact = MediaQuery.sizeOf(context).width < 600;
@@ -105,8 +119,8 @@ class _ShortcutFormDialogState extends State<ShortcutFormDialog> {
                         children: [
                           Text(
                             isEditing
-                                ? 'Editar Atalho de Comando'
-                                : 'Novo Atalho de Comando',
+                                ? l10n.editCommandShortcut
+                                : l10n.newCommandShortcut,
                             style: const TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
@@ -116,8 +130,8 @@ class _ShortcutFormDialogState extends State<ShortcutFormDialog> {
                           const SizedBox(height: 2),
                           Text(
                             isEditing
-                                ? 'Modifique as instruções e opções do comando'
-                                : 'Cadastre um comando rápido para execução remota em 1 clique',
+                                ? l10n.editShortcutDescription
+                                : l10n.newShortcutDescription,
                             style: const TextStyle(
                               fontSize: 12,
                               color: Color(0xFF94A3B8),
@@ -144,13 +158,13 @@ class _ShortcutFormDialogState extends State<ShortcutFormDialog> {
                       flex: 3,
                       child: TextFormField(
                         controller: _nameController,
-                        decoration: const InputDecoration(
-                          labelText: 'Nome do Atalho *',
-                          hintText: 'ex: Verificar Uso de Disco',
-                          prefixIcon: Icon(Icons.title, size: 18),
+                        decoration: InputDecoration(
+                          labelText: l10n.shortcutNameField,
+                          hintText: l10n.shortcutNameHint,
+                          prefixIcon: const Icon(Icons.title, size: 18),
                         ),
                         validator: (v) => v == null || v.trim().isEmpty
-                            ? 'Nome é obrigatório'
+                            ? l10n.nameRequired
                             : null,
                       ),
                     ),
@@ -159,10 +173,13 @@ class _ShortcutFormDialogState extends State<ShortcutFormDialog> {
                       flex: 2,
                       child: TextFormField(
                         controller: _categoryController,
-                        decoration: const InputDecoration(
-                          labelText: 'Categoria',
-                          hintText: 'ex: Sistema, Docker',
-                          prefixIcon: Icon(Icons.category_outlined, size: 18),
+                        decoration: InputDecoration(
+                          labelText: l10n.categoryField,
+                          hintText: l10n.categoryHint,
+                          prefixIcon: const Icon(
+                            Icons.category_outlined,
+                            size: 18,
+                          ),
                         ),
                       ),
                     ),
@@ -175,17 +192,17 @@ class _ShortcutFormDialogState extends State<ShortcutFormDialog> {
                   controller: _commandController,
                   maxLines: 3,
                   style: const TextStyle(fontFamily: 'monospace', fontSize: 13),
-                  decoration: const InputDecoration(
-                    labelText: 'Comando Remoto *',
-                    hintText: 'ex: df -h && free -m',
+                  decoration: InputDecoration(
+                    labelText: l10n.remoteCommandField,
+                    hintText: l10n.remoteCommandHint,
                     alignLabelWithHint: true,
-                    prefixIcon: Padding(
+                    prefixIcon: const Padding(
                       padding: EdgeInsets.only(bottom: 45),
                       child: Icon(Icons.terminal, size: 18),
                     ),
                   ),
                   validator: (v) => v == null || v.trim().isEmpty
-                      ? 'Comando é obrigatório'
+                      ? l10n.commandRequired
                       : null,
                 ),
                 const SizedBox(height: 16),
@@ -201,10 +218,10 @@ class _ShortcutFormDialogState extends State<ShortcutFormDialog> {
                           fontFamily: 'monospace',
                           fontSize: 12,
                         ),
-                        decoration: const InputDecoration(
-                          labelText: 'Diretório de Trabalho (opcional)',
-                          hintText: 'ex: /var/www/meu-app',
-                          prefixIcon: Icon(
+                        decoration: InputDecoration(
+                          labelText: l10n.workingDirectoryField,
+                          hintText: l10n.workingDirectoryHint,
+                          prefixIcon: const Icon(
                             Icons.folder_open_outlined,
                             size: 18,
                           ),
@@ -217,15 +234,18 @@ class _ShortcutFormDialogState extends State<ShortcutFormDialog> {
                       child: TextFormField(
                         controller: _timeoutController,
                         keyboardType: TextInputType.number,
-                        decoration: const InputDecoration(
-                          labelText: 'Timeout (s)',
+                        decoration: InputDecoration(
+                          labelText: l10n.timeoutField,
                           hintText: '30',
-                          prefixIcon: Icon(Icons.timer_outlined, size: 18),
+                          prefixIcon: const Icon(
+                            Icons.timer_outlined,
+                            size: 18,
+                          ),
                         ),
                         validator: (v) {
                           if (v == null || v.trim().isEmpty) return null;
                           final t = int.tryParse(v);
-                          if (t == null || t <= 0) return 'Inválido';
+                          if (t == null || t <= 0) return l10n.invalidTimeout;
                           return null;
                         },
                       ),
@@ -239,15 +259,15 @@ class _ShortcutFormDialogState extends State<ShortcutFormDialog> {
                   isExpanded: true,
                   initialValue: _selectedHostId,
                   dropdownColor: AppTheme.darkSurface,
-                  decoration: const InputDecoration(
-                    labelText: 'Vínculo com Servidor',
-                    prefixIcon: Icon(Icons.link, size: 18),
+                  decoration: InputDecoration(
+                    labelText: l10n.serverBinding,
+                    prefixIcon: const Icon(Icons.link, size: 18),
                   ),
                   items: [
-                    const DropdownMenuItem<String?>(
+                    DropdownMenuItem<String?>(
                       value: null,
                       child: Text(
-                        'Global (Disponível para qualquer servidor)',
+                        l10n.globalShortcut,
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
@@ -280,7 +300,7 @@ class _ShortcutFormDialogState extends State<ShortcutFormDialog> {
                   children: [
                     TextButton(
                       onPressed: () => Navigator.of(context).pop(),
-                      child: const Text('Cancelar'),
+                      child: Text(l10n.cancel),
                     ),
                     ElevatedButton.icon(
                       onPressed: () async {
@@ -300,7 +320,7 @@ class _ShortcutFormDialogState extends State<ShortcutFormDialog> {
                               30,
                           category: _categoryController.text.trim().isNotEmpty
                               ? _categoryController.text.trim()
-                              : 'Geral',
+                              : l10n.generalCategory,
                           createdAt:
                               widget.shortcutToEdit?.createdAt ??
                               DateTime.now(),
@@ -314,7 +334,7 @@ class _ShortcutFormDialogState extends State<ShortcutFormDialog> {
                       },
                       icon: const Icon(Icons.save_rounded, size: 16),
                       label: Text(
-                        isEditing ? 'Salvar Alterações' : 'Criar Atalho',
+                        isEditing ? l10n.saveChanges : l10n.createShortcut,
                       ),
                     ),
                   ],

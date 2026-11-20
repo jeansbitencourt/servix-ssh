@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../core/theme/app_theme.dart';
 import '../../domain/entities/ssh_host.dart';
+import '../../l10n/app_localizations.dart';
 
 class HostCard extends StatelessWidget {
   final SSHHost host;
@@ -23,6 +24,7 @@ class HostCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return InkWell(
       onTap: onSelect,
       borderRadius: BorderRadius.circular(12),
@@ -134,8 +136,8 @@ class HostCard extends StatelessWidget {
                 Expanded(
                   child: Text(
                     host.authType == SSHAuthType.privateKey
-                        ? 'Chave SSH'
-                        : 'Senha',
+                        ? l10n.sshKey
+                        : l10n.password,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
@@ -145,7 +147,7 @@ class HostCard extends StatelessWidget {
                   ),
                 ),
                 Tooltip(
-                  message: 'Abrir Terminal',
+                  message: l10n.openTerminal,
                   child: IconButton(
                     onPressed: onOpenTerminal,
                     icon: const Icon(
@@ -160,7 +162,7 @@ class HostCard extends StatelessWidget {
                 ),
                 const SizedBox(width: 6),
                 Tooltip(
-                  message: 'Editar',
+                  message: l10n.edit,
                   child: IconButton(
                     onPressed: onEdit,
                     icon: const Icon(
@@ -175,7 +177,7 @@ class HostCard extends StatelessWidget {
                 ),
                 const SizedBox(width: 6),
                 Tooltip(
-                  message: 'Excluir',
+                  message: l10n.delete,
                   child: IconButton(
                     onPressed: onDelete,
                     icon: const Icon(

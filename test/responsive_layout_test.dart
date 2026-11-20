@@ -18,7 +18,8 @@ import 'package:servix/domain/usecases/open_ssh_session_usecase.dart';
 import 'package:servix/presentation/stores/host_store.dart';
 import 'package:servix/presentation/stores/shortcut_store.dart';
 import 'package:servix/presentation/stores/terminal_session_store.dart';
-import 'package:servix/presentation/views/main_layout.dart';
+import 'package:servix/main.dart';
+import 'package:servix/l10n/app_localizations.dart';
 import 'package:servix/presentation/widgets/terminal_tab_view.dart';
 import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
@@ -89,13 +90,15 @@ void main() {
     shortcuts.shortcuts.value = [shortcut];
     shortcuts.executionHistory.value = [result];
 
+    final dispatcher = tester.binding.platformDispatcher;
+    dispatcher.localesTestValue = const [Locale('pt', 'BR')];
+    addTearDown(dispatcher.clearLocalesTestValue);
+
     tester.view.physicalSize = const Size(950, 540);
-    await tester.pumpWidget(
-      MaterialApp(theme: AppTheme.darkTheme, home: const MainLayout()),
-    );
+    await tester.pumpWidget(const ServixApp());
     await tester.pumpAndSettle();
     expect(find.text('Novo Servidor'), findsOneWidget);
-    expect(find.byTooltip(AppBrand.title), findsOneWidget);
+    expect(find.byTooltip('Servix — Central de Operações SSH'), findsOneWidget);
 
     tester.view.physicalSize = const Size(360, 480);
     await tester.pumpAndSettle();
@@ -131,8 +134,22 @@ void main() {
     tester.view.physicalSize = const Size(1280, 720);
     await tester.pumpAndSettle();
     expect(find.text(AppBrand.name), findsOneWidget);
-    expect(find.text(AppBrand.slogan), findsOneWidget);
+    expect(find.text('Central de Operações SSH'), findsOneWidget);
     expect(find.text('Executar Novamente'), findsOneWidget);
+
+    dispatcher.localesTestValue = const [Locale('en', 'GB')];
+    await tester.pumpAndSettle();
+    expect(find.text('SSH Operations Center'), findsOneWidget);
+    expect(find.text('Run Again'), findsOneWidget);
+
+    dispatcher.localesTestValue = const [Locale('pt', 'BR')];
+    await tester.pumpAndSettle();
+    expect(find.text('Executar Novamente'), findsOneWidget);
+
+    dispatcher.localesTestValue = const [Locale('fr', 'BR')];
+    await tester.pumpAndSettle();
+    expect(find.text('SSH Operations Center'), findsOneWidget);
+    expect(find.text('Run Again'), findsOneWidget);
   });
 
   testWidgets(
@@ -164,6 +181,9 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           theme: AppTheme.darkTheme,
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          locale: const Locale('pt', 'BR'),
           home: Scaffold(
             body: TerminalTabView(
               session: TerminalSession(

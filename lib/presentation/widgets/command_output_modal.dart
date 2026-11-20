@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/utils/date_formatter.dart';
 import '../../domain/entities/command_result.dart';
+import '../../l10n/app_localizations.dart';
 
 class CommandOutputModal extends StatelessWidget {
   final CommandResult result;
@@ -19,6 +20,7 @@ class CommandOutputModal extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final isSuccess = result.isSuccess;
 
     return Dialog(
@@ -61,7 +63,7 @@ class CommandOutputModal extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Resultado da Execução',
+                          l10n.commandResultTitle,
                           style: Theme.of(context).textTheme.titleMedium
                               ?.copyWith(
                                 fontWeight: FontWeight.bold,
@@ -70,7 +72,12 @@ class CommandOutputModal extends StatelessWidget {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          'Executado em ${DateFormatter.formatDateTime(result.executedAt)}',
+                          l10n.executedAt(
+                            DateFormatter.formatDateTime(
+                              result.executedAt,
+                              l10n.localeName,
+                            ),
+                          ),
                           style: const TextStyle(
                             fontSize: 12,
                             color: Color(0xFF94A3B8),
@@ -83,7 +90,7 @@ class CommandOutputModal extends StatelessWidget {
                     onPressed: onClose,
                     icon: const Icon(Icons.close, color: Color(0xFF94A3B8)),
                     splashRadius: 20,
-                    tooltip: 'Fechar',
+                    tooltip: l10n.close,
                   ),
                 ],
               ),
@@ -109,8 +116,8 @@ class CommandOutputModal extends StatelessWidget {
                     ),
                     child: Text(
                       isSuccess
-                          ? 'Exit Code 0 (Sucesso)'
-                          : 'Exit Code ${result.exitCode} (Erro)',
+                          ? l10n.exitCodeSuccess
+                          : l10n.exitCodeError(result.exitCode),
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
@@ -129,7 +136,10 @@ class CommandOutputModal extends StatelessWidget {
                       border: Border.all(color: AppTheme.primary, width: 1),
                     ),
                     child: Text(
-                      DateFormatter.formatDuration(result.durationMs),
+                      DateFormatter.formatDuration(
+                        result.durationMs,
+                        l10n.localeName,
+                      ),
                       style: const TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
@@ -189,24 +199,26 @@ class CommandOutputModal extends StatelessWidget {
                 children: [
                   OutlinedButton.icon(
                     onPressed: () {
-                      final content =
-                          'Comando: ${result.command}\n'
-                          'Status: Exit ${result.exitCode}\n'
-                          'Duração: ${DateFormatter.formatDuration(result.durationMs)}\n\n'
-                          '--- STDOUT ---\n${result.stdout}\n'
-                          '--- STDERR ---\n${result.stderr}';
+                      final content = l10n.commandOutputSummary(
+                        result.command,
+                        result.exitCode,
+                        DateFormatter.formatDuration(
+                          result.durationMs,
+                          l10n.localeName,
+                        ),
+                        result.stdout,
+                        result.stderr,
+                      );
                       Clipboard.setData(ClipboardData(text: content));
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text(
-                            'Saída copiada para a área de transferência!',
-                          ),
+                        SnackBar(
+                          content: Text(l10n.outputCopied),
                           duration: Duration(seconds: 2),
                         ),
                       );
                     },
                     icon: const Icon(Icons.copy, size: 16),
-                    label: const Text('Copiar Saída'),
+                    label: Text(l10n.copyOutput),
                   ),
                   if (onRerun != null) ...[
                     ElevatedButton.icon(
@@ -215,13 +227,10 @@ class CommandOutputModal extends StatelessWidget {
                         onRerun!();
                       },
                       icon: const Icon(Icons.refresh, size: 16),
-                      label: const Text('Executar Novamente'),
+                      label: Text(l10n.runAgain),
                     ),
                   ],
-                  OutlinedButton(
-                    onPressed: onClose,
-                    child: const Text('Fechar'),
-                  ),
+                  OutlinedButton(onPressed: onClose, child: Text(l10n.close)),
                 ],
               ),
               const SizedBox(height: 12),
@@ -263,8 +272,8 @@ class CommandOutputModal extends StatelessWidget {
                         ),
                       ],
                       if (result.stdout.isEmpty && result.stderr.isEmpty)
-                        const Text(
-                          '[O comando executou com sucesso sem gerar nenhuma saída de texto]',
+                        Text(
+                          l10n.noCommandOutput,
                           style: TextStyle(
                             color: Color(0xFF64748B),
                             fontStyle: FontStyle.italic,

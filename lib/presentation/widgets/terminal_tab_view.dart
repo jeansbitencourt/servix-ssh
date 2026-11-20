@@ -4,6 +4,7 @@ import 'package:xterm/xterm.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/theme/terminal_theme.dart';
 import '../../domain/entities/terminal_session.dart';
+import '../../l10n/app_localizations.dart';
 
 class TerminalTabView extends StatefulWidget {
   final TerminalSession session;
@@ -72,16 +73,23 @@ class _TerminalTabViewState extends State<TerminalTabView> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final host = widget.session.host;
     final address = '${host.username}@${host.host}:${host.port}';
     final (statusText, statusColor) = switch (widget.session.status) {
-      TerminalSessionStatus.connected => ('Conectado', AppTheme.success),
-      TerminalSessionStatus.connecting => ('Conectando…', AppTheme.warning),
+      TerminalSessionStatus.connected => (
+        l10n.terminalConnected,
+        AppTheme.success,
+      ),
+      TerminalSessionStatus.connecting => (
+        l10n.terminalConnecting,
+        AppTheme.warning,
+      ),
       TerminalSessionStatus.disconnected => (
-        'Desconectado',
+        l10n.terminalDisconnected,
         const Color(0xFF94A3B8),
       ),
-      TerminalSessionStatus.error => ('Erro', AppTheme.error),
+      TerminalSessionStatus.error => (l10n.terminalError, AppTheme.error),
     };
 
     return Column(
@@ -139,7 +147,7 @@ class _TerminalTabViewState extends State<TerminalTabView> {
                   ),
                   _toolbarButton(
                     Icons.remove,
-                    'Diminuir Fonte',
+                    l10n.decreaseFontSize,
                     _fontSize > 10 ? () => _adjustFontSize(-1) : null,
                   ),
                   SizedBox(
@@ -156,43 +164,43 @@ class _TerminalTabViewState extends State<TerminalTabView> {
                   ),
                   _toolbarButton(
                     Icons.add,
-                    'Aumentar Fonte',
+                    l10n.increaseFontSize,
                     _fontSize < 24 ? () => _adjustFontSize(1) : null,
                   ),
                   if (compact)
                     PopupMenuButton<_TerminalAction>(
                       icon: const Icon(Icons.more_vert, size: 16),
-                      tooltip: 'Ações do terminal',
+                      tooltip: l10n.terminalActions,
                       onSelected: _runAction,
-                      itemBuilder: (context) => const [
+                      itemBuilder: (context) => [
                         PopupMenuItem(
                           value: _TerminalAction.clear,
-                          child: Text('Limpar Tela'),
+                          child: Text(l10n.clearScreen),
                         ),
                         PopupMenuItem(
                           value: _TerminalAction.reconnect,
-                          child: Text('Reconectar'),
+                          child: Text(l10n.reconnect),
                         ),
                         PopupMenuItem(
                           value: _TerminalAction.close,
-                          child: Text('Fechar Terminal'),
+                          child: Text(l10n.closeTerminal),
                         ),
                       ],
                     )
                   else ...[
                     _toolbarButton(
                       Icons.cleaning_services_outlined,
-                      'Limpar Tela',
+                      l10n.clearScreen,
                       () => _runAction(_TerminalAction.clear),
                     ),
                     _toolbarButton(
                       Icons.refresh,
-                      'Reconectar',
+                      l10n.reconnect,
                       widget.onReconnect,
                     ),
                     _toolbarButton(
                       Icons.close,
-                      'Fechar Terminal',
+                      l10n.closeTerminal,
                       widget.onClose,
                     ),
                   ],

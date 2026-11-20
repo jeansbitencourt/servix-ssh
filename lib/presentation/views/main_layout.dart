@@ -12,6 +12,7 @@ import 'dashboard_view.dart';
 import 'hosts_view.dart';
 import 'shortcuts_view.dart';
 import 'terminal_view.dart';
+import '../../l10n/app_localizations.dart';
 
 class MainLayout extends StatefulWidget {
   const MainLayout({super.key});
@@ -35,13 +36,14 @@ class _MainLayoutState extends State<MainLayout> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final width = MediaQuery.sizeOf(context).width;
     final compact = width < 1200;
     final vaultName = switch (defaultTargetPlatform) {
       TargetPlatform.linux => 'GNOME Keyring / KWallet',
-      TargetPlatform.macOS => 'Chaves do macOS',
-      TargetPlatform.windows => 'Credenciais do Windows',
-      _ => 'Cofre do sistema',
+      TargetPlatform.macOS => l10n.macosKeychain,
+      TargetPlatform.windows => l10n.windowsCredentials,
+      _ => l10n.systemVault,
     };
 
     return SignalBuilder(
@@ -61,7 +63,7 @@ class _MainLayoutState extends State<MainLayout> {
                 ),
                 child: Column(
                   children: [
-                    _buildBrand(compact),
+                    _buildBrand(compact, l10n),
 
                     // Navigation Items
                     const SizedBox(height: 16),
@@ -75,14 +77,14 @@ class _MainLayoutState extends State<MainLayout> {
                             index: 0,
                             compact: compact,
                             icon: Icons.dashboard_rounded,
-                            label: 'Dashboard',
+                            label: l10n.dashboard,
                           ),
                           const SizedBox(height: 4),
                           _buildNavItem(
                             index: 1,
                             compact: compact,
                             icon: Icons.dns_rounded,
-                            label: 'Servidores',
+                            label: l10n.servers,
                             badge: hostCount > 0 ? hostCount.toString() : null,
                           ),
                           const SizedBox(height: 4),
@@ -90,14 +92,14 @@ class _MainLayoutState extends State<MainLayout> {
                             index: 2,
                             compact: compact,
                             icon: Icons.flash_on_rounded,
-                            label: 'Atalhos',
+                            label: l10n.shortcuts,
                           ),
                           const SizedBox(height: 4),
                           _buildNavItem(
                             index: 3,
                             compact: compact,
                             icon: Icons.terminal_rounded,
-                            label: 'Terminais',
+                            label: l10n.terminals,
                             badge: activeTerminalCount > 0
                                 ? activeTerminalCount.toString()
                                 : null,
@@ -109,7 +111,7 @@ class _MainLayoutState extends State<MainLayout> {
 
                     if (compact)
                       Tooltip(
-                        message: 'Cofre Ativo · $vaultName',
+                        message: l10n.vaultStatus(vaultName),
                         child: const Padding(
                           padding: EdgeInsets.all(14),
                           child: Icon(
@@ -144,8 +146,8 @@ class _MainLayoutState extends State<MainLayout> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  const Text(
-                                    'Cofre Ativo',
+                                  Text(
+                                    l10n.vaultActive,
                                     style: TextStyle(
                                       fontSize: 12,
                                       fontWeight: FontWeight.bold,
@@ -211,7 +213,7 @@ class _MainLayoutState extends State<MainLayout> {
     );
   }
 
-  Widget _buildBrand(bool compact) {
+  Widget _buildBrand(bool compact, AppLocalizations l10n) {
     final icon = Image.asset(
       AppBrand.iconAsset,
       width: compact ? 42 : 52,
@@ -229,17 +231,17 @@ class _MainLayoutState extends State<MainLayout> {
       ),
       child: compact
           ? Center(
-              child: Tooltip(message: AppBrand.title, child: icon),
+              child: Tooltip(message: l10n.appTitle, child: icon),
             )
           : Row(
               children: [
                 icon,
                 const SizedBox(width: 8),
-                const Expanded(
+                Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
+                      const Text(
                         AppBrand.name,
                         style: TextStyle(
                           fontSize: 20,
@@ -248,7 +250,7 @@ class _MainLayoutState extends State<MainLayout> {
                         ),
                       ),
                       Text(
-                        AppBrand.slogan,
+                        l10n.appSlogan,
                         style: TextStyle(
                           fontSize: 11,
                           fontWeight: FontWeight.w500,

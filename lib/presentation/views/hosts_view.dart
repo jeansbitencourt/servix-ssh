@@ -4,6 +4,7 @@ import 'package:signals_flutter/signals_flutter.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/utils/date_formatter.dart';
 import '../../domain/entities/ssh_host.dart';
+import '../../l10n/app_localizations.dart';
 import '../stores/host_store.dart';
 import '../stores/shortcut_store.dart';
 import '../stores/terminal_session_store.dart';
@@ -38,17 +39,26 @@ class _HostsViewState extends State<HostsView> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return SignalBuilder(
       builder: (context) {
         final hosts = hostStore.filteredHosts.value;
         final selectedHost = hostStore.selectedHost.value;
-        final groups = hostStore.groups.value;
+        final groups = [null, ...hostStore.groups.value];
         final selectedGroup = hostStore.selectedGroup.value;
         final hasSearch = hostStore.searchQuery.value.isNotEmpty;
         final shortcuts = shortcutStore.shortcuts.value;
         final isTesting = hostStore.isTestingConnection.value;
-        final testResult = hostStore.connectionTestResult.value;
+        final testError = hostStore.connectionTestError.value;
         final testSuccess = hostStore.isConnectionSuccess.value;
+        final testMessage = switch (testSuccess) {
+          null => l10n.checkSshConnectivity,
+          true => l10n.connectionTestSucceeded,
+          false =>
+            testError == null
+                ? l10n.connectionTestReturnedFalse
+                : l10n.connectionFailed(testError),
+        };
 
         final lastRes = shortcutStore.lastResult.value;
         final isOutputOpen = shortcutStore.isOutputModalVisible.value;
@@ -86,8 +96,7 @@ class _HostsViewState extends State<HostsView> {
                               children: [
                                 TextField(
                                   decoration: InputDecoration(
-                                    hintText:
-                                        'Buscar por nome, host ou usuário...',
+                                    hintText: l10n.hostSearchHint,
                                     prefixIcon: const Icon(
                                       Icons.search,
                                       size: 18,
@@ -124,7 +133,7 @@ class _HostsViewState extends State<HostsView> {
                                           right: 6,
                                         ),
                                         child: ChoiceChip(
-                                          label: Text(g),
+                                          label: Text(g ?? l10n.allGroups),
                                           selected: isSelected,
                                           onSelected: (_) =>
                                               hostStore.selectedGroup.value = g,
@@ -169,7 +178,7 @@ class _HostsViewState extends State<HostsView> {
                                         ),
                                         const SizedBox(height: 12),
                                         Text(
-                                          'Nenhum servidor encontrado',
+                                          l10n.noServersFound,
                                           style: TextStyle(
                                             color: Colors.grey[400],
                                             fontSize: 13,
@@ -234,7 +243,7 @@ class _HostsViewState extends State<HostsView> {
                                   );
                                 },
                                 icon: const Icon(Icons.add_rounded, size: 18),
-                                label: const Text('Cadastrar Novo Servidor'),
+                                label: Text(l10n.addNewServer),
                               ),
                             ),
                           ),
@@ -262,8 +271,8 @@ class _HostsViewState extends State<HostsView> {
                                   color: Colors.grey[600],
                                 ),
                                 const SizedBox(height: 16),
-                                const Text(
-                                  'Selecione um servidor da lista para inspecionar',
+                                Text(
+                                  l10n.selectServerToInspect,
                                   style: TextStyle(
                                     color: Color(0xFF94A3B8),
                                     fontSize: 15,
@@ -285,7 +294,7 @@ class _HostsViewState extends State<HostsView> {
                                       Icons.arrow_back_rounded,
                                       size: 18,
                                     ),
-                                    label: const Text('Voltar à lista'),
+                                    label: Text(l10n.backToList),
                                   ),
                                   const SizedBox(height: 12),
                                 ],
@@ -383,7 +392,7 @@ class _HostsViewState extends State<HostsView> {
                                     Icons.terminal_rounded,
                                     size: 18,
                                   ),
-                                  label: const Text('Abrir Terminal'),
+                                  label: Text(l10n.openTerminal),
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: AppTheme.accent,
                                     foregroundColor: Colors.black,
@@ -425,7 +434,7 @@ class _HostsViewState extends State<HostsView> {
                                           const SizedBox(width: 12),
                                           Expanded(
                                             child: Text(
-                                              testResult ?? 'Verifique a conectividade SSH com a porta e credenciais.',
+                                              testMessage,
                                               style: TextStyle(
                                                 fontSize: 13,
                                                 color: testSuccess == true
@@ -453,7 +462,7 @@ class _HostsViewState extends State<HostsView> {
                                                       strokeWidth: 2,
                                                     ),
                                               )
-                                            : const Text('Testar Conexão'),
+                                            : Text(l10n.testConnection),
                                       );
                                       if (constraints.maxWidth < 400) {
                                         return Column(
@@ -492,8 +501,8 @@ class _HostsViewState extends State<HostsView> {
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      const Text(
-                                        'Parâmetros Técnicos de Acesso',
+                                      Text(
+                                        l10n.accessParameters,
                                         style: TextStyle(
                                           fontSize: 15,
                                           fontWeight: FontWeight.bold,
@@ -502,33 +511,34 @@ class _HostsViewState extends State<HostsView> {
                                       ),
                                       const SizedBox(height: 16),
                                       _buildParamRow(
-                                        'Endereço do Host',
+                                        l10n.hostAddress,
                                         selectedHost.host,
                                       ),
                                       _buildParamRow(
-                                        'Porta SSH',
+                                        l10n.sshPort,
                                         selectedHost.port.toString(),
                                       ),
                                       _buildParamRow(
-                                        'Usuário',
+                                        l10n.username,
                                         selectedHost.username,
                                       ),
                                       _buildParamRow(
-                                        'Tipo de Autenticação',
+                                        l10n.authenticationType,
                                         selectedHost.authType ==
                                                 SSHAuthType.privateKey
-                                            ? 'Chave Privada (Ed25519/RSA)'
-                                            : 'Senha (Armazenada no Keyring)',
+                                            ? l10n.privateKeyType
+                                            : l10n.keyringPassword,
                                       ),
                                       if (selectedHost.keyFilePath != null)
                                         _buildParamRow(
-                                          'Arquivo de Chave',
+                                          l10n.keyFile,
                                           selectedHost.keyFilePath!,
                                         ),
                                       _buildParamRow(
-                                        'Cadastrado em',
+                                        l10n.addedOn,
                                         DateFormatter.formatDateTime(
                                           selectedHost.createdAt,
+                                          l10n.localeName,
                                         ),
                                       ),
                                     ],
@@ -542,8 +552,8 @@ class _HostsViewState extends State<HostsView> {
                                   runSpacing: 4,
                                   crossAxisAlignment: WrapCrossAlignment.center,
                                   children: [
-                                    const Text(
-                                      'Atalhos de Comandos para Este Servidor',
+                                    Text(
+                                      l10n.serverShortcuts,
                                       style: TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.bold,
@@ -551,7 +561,15 @@ class _HostsViewState extends State<HostsView> {
                                       ),
                                     ),
                                     Text(
-                                      '${shortcuts.where((s) => s.hostId == null || s.hostId == selectedHost.id).length} disponíveis',
+                                      l10n.availableShortcuts(
+                                        shortcuts
+                                            .where(
+                                              (s) =>
+                                                  s.hostId == null ||
+                                                  s.hostId == selectedHost.id,
+                                            )
+                                            .length,
+                                      ),
                                       style: const TextStyle(
                                         fontSize: 12,
                                         color: Color(0xFF94A3B8),
@@ -621,6 +639,7 @@ class _HostsViewState extends State<HostsView> {
     SSHHost host,
     dynamic shortcuts,
   ) {
+    final l10n = AppLocalizations.of(context);
     final available = shortcuts
         .where((s) => s.hostId == null || s.hostId == host.id)
         .toList();
@@ -633,9 +652,9 @@ class _HostsViewState extends State<HostsView> {
           borderRadius: BorderRadius.circular(12),
           border: Border.all(color: AppTheme.darkBorder),
         ),
-        child: const Center(
+        child: Center(
           child: Text(
-            'Nenhum atalho configurado para este servidor.',
+            l10n.noServerShortcuts,
             style: TextStyle(color: Color(0xFF94A3B8), fontSize: 13),
           ),
         ),
@@ -723,17 +742,16 @@ class _HostsViewState extends State<HostsView> {
   }
 
   void _confirmDelete(BuildContext context, SSHHost host) {
+    final l10n = AppLocalizations.of(context);
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Excluir Servidor?'),
-        content: Text(
-          'Tem certeza que deseja remover o servidor "${host.name}" e suas credenciais salvas?',
-        ),
+        title: Text(l10n.deleteServerTitle),
+        content: Text(l10n.deleteServerConfirmation(host.name)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('Cancelar'),
+            child: Text(l10n.cancel),
           ),
           ElevatedButton(
             onPressed: () {
@@ -741,7 +759,7 @@ class _HostsViewState extends State<HostsView> {
               hostStore.deleteHost(host.id);
             },
             style: ElevatedButton.styleFrom(backgroundColor: AppTheme.error),
-            child: const Text('Excluir'),
+            child: Text(l10n.delete),
           ),
         ],
       ),

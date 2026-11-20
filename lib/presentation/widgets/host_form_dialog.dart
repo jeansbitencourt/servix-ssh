@@ -5,6 +5,7 @@ import 'package:uuid/uuid.dart';
 
 import '../../core/theme/app_theme.dart';
 import '../../domain/entities/ssh_host.dart';
+import '../../l10n/app_localizations.dart';
 import '../stores/host_store.dart';
 
 class HostFormDialog extends StatefulWidget {
@@ -24,7 +25,8 @@ class _HostFormDialogState extends State<HostFormDialog> {
   late TextEditingController _hostController;
   late TextEditingController _portController;
   late TextEditingController _usernameController;
-  late TextEditingController _groupController;
+  late final TextEditingController _groupController;
+  bool _hasInitializedGroup = false;
   late TextEditingController _passwordController;
   late TextEditingController _keyPathController;
   late TextEditingController _passphraseController;
@@ -41,12 +43,23 @@ class _HostFormDialogState extends State<HostFormDialog> {
     _hostController = TextEditingController(text: h?.host ?? '');
     _portController = TextEditingController(text: (h?.port ?? 22).toString());
     _usernameController = TextEditingController(text: h?.username ?? '');
-    _groupController = TextEditingController(text: h?.groupName ?? 'Default');
     _passwordController = TextEditingController();
     _keyPathController = TextEditingController(text: h?.keyFilePath ?? '');
     _passphraseController = TextEditingController();
 
     _authType = h?.authType ?? SSHAuthType.password;
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_hasInitializedGroup) return;
+
+    final l10n = AppLocalizations.of(context);
+    _groupController = TextEditingController(
+      text: widget.hostToEdit?.groupName ?? l10n.defaultGroup,
+    );
+    _hasInitializedGroup = true;
   }
 
   @override
@@ -63,8 +76,9 @@ class _HostFormDialogState extends State<HostFormDialog> {
   }
 
   Future<void> _pickKeyFile() async {
+    final l10n = AppLocalizations.of(context);
     try {
-      final file = await openFile(confirmButtonText: 'Selecionar chave');
+      final file = await openFile(confirmButtonText: l10n.selectKey);
       if (!mounted || file == null) return;
 
       _keyPathController.text = file.path;
@@ -74,14 +88,12 @@ class _HostFormDialogState extends State<HostFormDialog> {
       await showDialog<void>(
         context: context,
         builder: (context) => AlertDialog(
-          title: const Text('Não foi possível abrir o seletor de arquivos'),
-          content: const Text(
-            'Você pode digitar o caminho da chave privada no formulário.',
-          ),
+          title: Text(l10n.filePickerError),
+          content: Text(l10n.enterKeyPathInstead),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Fechar'),
+              child: Text(l10n.close),
             ),
           ],
         ),
@@ -89,7 +101,7 @@ class _HostFormDialogState extends State<HostFormDialog> {
     }
   }
 
-  SSHHost _buildHostFromForm() {
+  SSHHost _buildHostFromForm(AppLocalizations l10n) {
     return SSHHost(
       id: widget.hostToEdit?.id ?? const Uuid().v4(),
       name: _nameController.text.trim(),
@@ -101,7 +113,7 @@ class _HostFormDialogState extends State<HostFormDialog> {
           ? _keyPathController.text.trim()
           : null,
       groupName: _groupController.text.trim().isEmpty
-          ? 'Default'
+          ? l10n.defaultGroup
           : _groupController.text.trim(),
       createdAt: widget.hostToEdit?.createdAt ?? DateTime.now(),
       updatedAt: DateTime.now(),
@@ -110,6 +122,7 @@ class _HostFormDialogState extends State<HostFormDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final isEditing = widget.hostToEdit != null;
 
     final compact = MediaQuery.sizeOf(context).width < 600;
@@ -156,8 +169,8 @@ class _HostFormDialogState extends State<HostFormDialog> {
                         children: [
                           Text(
                             isEditing
-                                ? 'Editar Conexão SSH'
-                                : 'Nova Conexão SSH',
+                                ? l10n.editSshConnection
+                                : l10n.newSshConnection,
                             style: const TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
@@ -167,8 +180,8 @@ class _HostFormDialogState extends State<HostFormDialog> {
                           const SizedBox(height: 2),
                           Text(
                             isEditing
-                                ? 'Atualize os dados e credenciais do servidor'
-                                : 'Configure as credenciais e parâmetros de acesso ao servidor',
+                                ? l10n.editSshConnectionDescription
+                                : l10n.newSshConnectionDescription,
                             style: const TextStyle(
                               fontSize: 12,
                               color: Color(0xFF94A3B8),
@@ -195,13 +208,13 @@ class _HostFormDialogState extends State<HostFormDialog> {
                       flex: 3,
                       child: TextFormField(
                         controller: _nameController,
-                        decoration: const InputDecoration(
-                          labelText: 'Nome do Servidor *',
-                          hintText: 'ex: VPS Produção 01',
-                          prefixIcon: Icon(Icons.label_outline, size: 18),
+                        decoration: InputDecoration(
+                          labelText: l10n.serverNameField,
+                          hintText: l10n.serverNameHint,
+                          prefixIcon: const Icon(Icons.label_outline, size: 18),
                         ),
                         validator: (v) => v == null || v.trim().isEmpty
-                            ? 'Nome é obrigatório'
+                            ? l10n.nameRequired
                             : null,
                       ),
                     ),
@@ -210,10 +223,13 @@ class _HostFormDialogState extends State<HostFormDialog> {
                       flex: 2,
                       child: TextFormField(
                         controller: _groupController,
-                        decoration: const InputDecoration(
-                          labelText: 'Grupo / Tag',
-                          hintText: 'ex: Produção',
-                          prefixIcon: Icon(Icons.folder_outlined, size: 18),
+                        decoration: InputDecoration(
+                          labelText: l10n.serverGroupField,
+                          hintText: l10n.serverGroupHint,
+                          prefixIcon: const Icon(
+                            Icons.folder_outlined,
+                            size: 18,
+                          ),
                         ),
                       ),
                     ),
@@ -228,13 +244,16 @@ class _HostFormDialogState extends State<HostFormDialog> {
                       flex: 3,
                       child: TextFormField(
                         controller: _hostController,
-                        decoration: const InputDecoration(
-                          labelText: 'Host / IP *',
-                          hintText: 'ex: 192.168.1.100 ou vps.dominio.com',
-                          prefixIcon: Icon(Icons.cloud_outlined, size: 18),
+                        decoration: InputDecoration(
+                          labelText: l10n.hostField,
+                          hintText: l10n.hostHint,
+                          prefixIcon: const Icon(
+                            Icons.cloud_outlined,
+                            size: 18,
+                          ),
                         ),
                         validator: (v) => v == null || v.trim().isEmpty
-                            ? 'Host é obrigatório'
+                            ? l10n.hostRequired
                             : null,
                       ),
                     ),
@@ -244,16 +263,16 @@ class _HostFormDialogState extends State<HostFormDialog> {
                       child: TextFormField(
                         controller: _portController,
                         keyboardType: TextInputType.number,
-                        decoration: const InputDecoration(
-                          labelText: 'Porta',
+                        decoration: InputDecoration(
+                          labelText: l10n.portField,
                           hintText: '22',
-                          prefixIcon: Icon(Icons.numbers, size: 18),
+                          prefixIcon: const Icon(Icons.numbers, size: 18),
                         ),
                         validator: (v) {
                           if (v == null || v.trim().isEmpty) return null;
                           final p = int.tryParse(v);
                           if (p == null || p <= 0 || p > 65535) {
-                            return 'Inválida';
+                            return l10n.invalidPort;
                           }
                           return null;
                         },
@@ -264,13 +283,16 @@ class _HostFormDialogState extends State<HostFormDialog> {
                       flex: 2,
                       child: TextFormField(
                         controller: _usernameController,
-                        decoration: const InputDecoration(
-                          labelText: 'Usuário SSH *',
-                          hintText: 'ex: root, ubuntu',
-                          prefixIcon: Icon(Icons.person_outline, size: 18),
+                        decoration: InputDecoration(
+                          labelText: l10n.sshUsernameField,
+                          hintText: l10n.sshUsernameHint,
+                          prefixIcon: const Icon(
+                            Icons.person_outline,
+                            size: 18,
+                          ),
                         ),
                         validator: (v) => v == null || v.trim().isEmpty
-                            ? 'Usuário é obrigatório'
+                            ? l10n.usernameRequired
                             : null,
                       ),
                     ),
@@ -279,9 +301,9 @@ class _HostFormDialogState extends State<HostFormDialog> {
                 const SizedBox(height: 20),
 
                 // Auth Type Selector
-                const Text(
-                  'Tipo de Autenticação',
-                  style: TextStyle(
+                Text(
+                  l10n.authenticationType,
+                  style: const TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
                     color: Color(0xFFE2E8F0),
@@ -289,16 +311,16 @@ class _HostFormDialogState extends State<HostFormDialog> {
                 ),
                 const SizedBox(height: 8),
                 SegmentedButton<SSHAuthType>(
-                  segments: const [
+                  segments: [
                     ButtonSegment(
                       value: SSHAuthType.password,
-                      label: Text('Senha'),
-                      icon: Icon(Icons.password_rounded, size: 16),
+                      label: Text(l10n.password),
+                      icon: const Icon(Icons.password_rounded, size: 16),
                     ),
                     ButtonSegment(
                       value: SSHAuthType.privateKey,
-                      label: Text('Chave Privada (SSH Key)'),
-                      icon: Icon(Icons.key_rounded, size: 16),
+                      label: Text(l10n.privateKeyAuthentication),
+                      icon: const Icon(Icons.key_rounded, size: 16),
                     ),
                   ],
                   selected: {_authType},
@@ -317,8 +339,8 @@ class _HostFormDialogState extends State<HostFormDialog> {
                     obscureText: _obscurePassword,
                     decoration: InputDecoration(
                       labelText: isEditing
-                          ? 'Nova Senha (deixe em branco para manter a atual)'
-                          : 'Senha SSH *',
+                          ? l10n.newPasswordField
+                          : l10n.sshPasswordField,
                       hintText: '••••••••••••',
                       prefixIcon: const Icon(Icons.lock_outline, size: 18),
                       suffixIcon: IconButton(
@@ -335,7 +357,7 @@ class _HostFormDialogState extends State<HostFormDialog> {
                     ),
                     validator: (v) {
                       if (!isEditing && (v == null || v.isEmpty)) {
-                        return 'Senha é obrigatória para novas conexões';
+                        return l10n.passwordRequired;
                       }
                       return null;
                     },
@@ -346,10 +368,10 @@ class _HostFormDialogState extends State<HostFormDialog> {
                       Expanded(
                         child: TextFormField(
                           controller: _keyPathController,
-                          decoration: const InputDecoration(
-                            labelText: 'Caminho do Arquivo de Chave Privada *',
-                            hintText: '/home/usuario/.ssh/id_rsa ou id_ed25519',
-                            prefixIcon: Icon(
+                          decoration: InputDecoration(
+                            labelText: l10n.privateKeyPathField,
+                            hintText: l10n.privateKeyPathHint,
+                            prefixIcon: const Icon(
                               Icons.insert_drive_file_outlined,
                               size: 18,
                             ),
@@ -357,7 +379,7 @@ class _HostFormDialogState extends State<HostFormDialog> {
                           validator: (v) {
                             if (_authType == SSHAuthType.privateKey &&
                                 (v == null || v.trim().isEmpty)) {
-                              return 'Caminho do arquivo de chave é obrigatório';
+                              return l10n.keyPathRequired;
                             }
                             return null;
                           },
@@ -367,7 +389,7 @@ class _HostFormDialogState extends State<HostFormDialog> {
                       ElevatedButton.icon(
                         onPressed: _pickKeyFile,
                         icon: const Icon(Icons.file_open_outlined, size: 16),
-                        label: const Text('Procurar...'),
+                        label: Text(l10n.browseFiles),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppTheme.darkSurfaceCard,
                           foregroundColor: const Color(0xFFE2E8F0),
@@ -381,8 +403,8 @@ class _HostFormDialogState extends State<HostFormDialog> {
                     controller: _passphraseController,
                     obscureText: _obscurePassphrase,
                     decoration: InputDecoration(
-                      labelText: 'Passphrase da Chave (opcional)',
-                      hintText: 'Deixe vazio se a chave não for criptografada',
+                      labelText: l10n.keyPassphraseField,
+                      hintText: l10n.keyPassphraseHint,
                       prefixIcon: const Icon(
                         Icons.lock_clock_outlined,
                         size: 18,
@@ -415,7 +437,7 @@ class _HostFormDialogState extends State<HostFormDialog> {
                     OutlinedButton.icon(
                       onPressed: () async {
                         if (!_formKey.currentState!.validate()) return;
-                        final host = _buildHostFromForm();
+                        final host = _buildHostFromForm(l10n);
                         final pw = _passwordController.text.isNotEmpty
                             ? _passwordController.text
                             : null;
@@ -437,8 +459,14 @@ class _HostFormDialogState extends State<HostFormDialog> {
                                   : AppTheme.error,
                               content: Text(
                                 ok
-                                    ? 'Conexão SSH bem-sucedida!'
-                                    : 'Falha ao conectar: ${widget.hostStore.connectionTestResult.value ?? ""}',
+                                    ? l10n.connectionTestSucceeded
+                                    : l10n.connectionFailed(
+                                        widget
+                                                .hostStore
+                                                .connectionTestError
+                                                .value ??
+                                            l10n.connectionTestReturnedFalse,
+                                      ),
                               ),
                               duration: const Duration(seconds: 3),
                             ),
@@ -446,16 +474,16 @@ class _HostFormDialogState extends State<HostFormDialog> {
                         }
                       },
                       icon: const Icon(Icons.network_check_rounded, size: 16),
-                      label: const Text('Testar Conexão'),
+                      label: Text(l10n.testConnection),
                     ),
                     TextButton(
                       onPressed: () => Navigator.of(context).pop(),
-                      child: const Text('Cancelar'),
+                      child: Text(l10n.cancel),
                     ),
                     ElevatedButton.icon(
                       onPressed: () async {
                         if (!_formKey.currentState!.validate()) return;
-                        final host = _buildHostFromForm();
+                        final host = _buildHostFromForm(l10n);
                         final pw = _passwordController.text.isNotEmpty
                             ? _passwordController.text
                             : null;
@@ -475,7 +503,7 @@ class _HostFormDialogState extends State<HostFormDialog> {
                       },
                       icon: const Icon(Icons.save_rounded, size: 16),
                       label: Text(
-                        isEditing ? 'Salvar Alterações' : 'Cadastrar Servidor',
+                        isEditing ? l10n.saveChanges : l10n.addServer,
                       ),
                     ),
                   ],

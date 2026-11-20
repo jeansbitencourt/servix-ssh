@@ -1,5 +1,7 @@
 import 'dart:async';
+
 import 'package:signals_flutter/signals_flutter.dart';
+
 import '../../domain/entities/ssh_host.dart';
 import '../../domain/usecases/manage_hosts_usecase.dart';
 
@@ -13,15 +15,16 @@ class HostStore {
   final selectedHost = signal<SSHHost?>(null);
   final isLoading = signal<bool>(false);
   final isTestingConnection = signal<bool>(false);
-  final connectionTestResult = signal<String?>(null);
+  final connectionTestError = signal<String?>(null);
   final isConnectionSuccess = signal<bool?>(null);
 
   final searchQuery = signal<String>('');
-  final selectedGroup = signal<String>('Todos');
+  final selectedGroup = signal<String?>(null);
 
   late final groups = computed<List<String>>(() {
-    final uniqueGroups = hosts.value.map((h) => h.groupName).toSet().toList()..sort();
-    return ['Todos', ...uniqueGroups];
+    final uniqueGroups = hosts.value.map((h) => h.groupName).toSet().toList()
+      ..sort();
+    return uniqueGroups;
   });
 
   late final filteredHosts = computed<List<SSHHost>>(() {
@@ -29,11 +32,12 @@ class HostStore {
     final group = selectedGroup.value;
 
     return hosts.value.where((h) {
-      final matchesQuery = query.isEmpty ||
+      final matchesQuery =
+          query.isEmpty ||
           h.name.toLowerCase().contains(query) ||
           h.host.toLowerCase().contains(query) ||
           h.username.toLowerCase().contains(query);
-      final matchesGroup = group == 'Todos' || h.groupName == group;
+      final matchesGroup = group == null || h.groupName == group;
 
       return matchesQuery && matchesGroup;
     }).toList();
@@ -48,7 +52,9 @@ class HostStore {
 
       if (selectedHost.value != null) {
         // Keep selection updated
-        final updated = list.where((h) => h.id == selectedHost.value!.id).firstOrNull;
+        final updated = list
+            .where((h) => h.id == selectedHost.value!.id)
+            .firstOrNull;
         selectedHost.value = updated;
       } else if (list.isNotEmpty) {
         selectedHost.value = list.first;
@@ -58,14 +64,22 @@ class HostStore {
 
   void selectHost(SSHHost? host) {
     selectedHost.value = host;
-    connectionTestResult.value = null;
+    connectionTestError.value = null;
     isConnectionSuccess.value = null;
   }
 
-  Future<void> saveHost(SSHHost host, {String? password, String? passphrase}) async {
+  Future<void> saveHost(
+    SSHHost host, {
+    String? password,
+    String? passphrase,
+  }) async {
     isLoading.value = true;
     try {
-      await _manageHostsUseCase.saveHost(host, password: password, passphrase: passphrase);
+      await _manageHostsUseCase.saveHost(
+        host,
+        password: password,
+        passphrase: passphrase,
+      );
       selectedHost.value = host;
     } finally {
       isLoading.value = false;
@@ -84,9 +98,13 @@ class HostStore {
     }
   }
 
-  Future<bool> testConnection(SSHHost host, {String? password, String? passphrase}) async {
+  Future<bool> testConnection(
+    SSHHost host, {
+    String? password,
+    String? passphrase,
+  }) async {
     isTestingConnection.value = true;
-    connectionTestResult.value = null;
+    connectionTestError.value = null;
     isConnectionSuccess.value = null;
 
     try {
@@ -96,11 +114,10 @@ class HostStore {
         passphrase: passphrase,
       );
       isConnectionSuccess.value = ok;
-      connectionTestResult.value = ok ? 'Conexão estabelecida com sucesso!' : 'Falha na conexão SSH';
       return ok;
     } catch (e) {
       isConnectionSuccess.value = false;
-      connectionTestResult.value = 'Erro: $e';
+      connectionTestError.value = e.toString();
       return false;
     } finally {
       isTestingConnection.value = false;

@@ -4,6 +4,7 @@ import 'package:signals_flutter/signals_flutter.dart';
 import '../../core/theme/app_theme.dart';
 import '../../domain/entities/ssh_host.dart';
 import '../../domain/entities/terminal_session.dart';
+import '../../l10n/app_localizations.dart';
 import '../stores/host_store.dart';
 import '../stores/terminal_session_store.dart';
 import '../widgets/terminal_tab_view.dart';
@@ -22,6 +23,7 @@ class TerminalViewScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return SignalBuilder(
       builder: (context) {
         final sessions = terminalStore.sessions.value;
@@ -49,8 +51,8 @@ class TerminalViewScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 24),
-                  const Text(
-                    'Nenhum Terminal Aberto',
+                  Text(
+                    l10n.noOpenTerminals,
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
@@ -58,8 +60,8 @@ class TerminalViewScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 8),
-                  const Text(
-                    'Abra uma sessão SSH interativa direta para executar comandos no servidor.',
+                  Text(
+                    l10n.openTerminalDescription,
                     textAlign: TextAlign.center,
                     style: TextStyle(fontSize: 14, color: Color(0xFF94A3B8)),
                   ),
@@ -67,7 +69,7 @@ class TerminalViewScreen extends StatelessWidget {
                   ElevatedButton.icon(
                     onPressed: () => _showOpenSessionDialog(context, hosts),
                     icon: const Icon(Icons.add, size: 18),
-                    label: const Text('Iniciar Sessão SSH'),
+                    label: Text(l10n.startSshSession),
                   ),
                 ],
               ),
@@ -184,7 +186,7 @@ class TerminalViewScreen extends StatelessWidget {
                     onPressed: () => _showOpenSessionDialog(context, hosts),
                     icon: const Icon(Icons.add, size: 18),
                     splashRadius: 16,
-                    tooltip: 'Nova Sessão SSH',
+                    tooltip: l10n.newSshSession,
                   ),
                   const SizedBox(width: 8),
                 ],
@@ -216,12 +218,11 @@ class TerminalViewScreen extends StatelessWidget {
   }
 
   void _showOpenSessionDialog(BuildContext context, List<SSHHost> hosts) {
+    final l10n = AppLocalizations.of(context);
     if (hosts.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-            'Cadastre pelo menos um servidor antes de abrir um terminal!',
-          ),
+        SnackBar(
+          content: Text(l10n.serverRequiredForTerminal),
           backgroundColor: AppTheme.warning,
         ),
       );
@@ -231,7 +232,7 @@ class TerminalViewScreen extends StatelessWidget {
     showDialog(
       context: context,
       builder: (ctx) => SimpleDialog(
-        title: const Text('Conectar ao Servidor'),
+        title: Text(l10n.connectToServer),
         children: hosts
             .map(
               (h) => SimpleDialogOption(

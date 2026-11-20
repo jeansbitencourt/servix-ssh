@@ -1,6 +1,7 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import '../../core/errors/exceptions.dart';
+import '../../l10n/system_localizations.dart';
 
 class SecureStorageDatasource {
   final FlutterSecureStorage _storage;
@@ -22,7 +23,10 @@ class SecureStorageDatasource {
     try {
       await _storage.write(key: _passwordKey(hostId), value: password);
     } catch (e) {
-      throw StorageException('Falha ao salvar senha no cofre seguro: $e', e);
+      throw StorageException(
+        systemLocalizations.savePasswordFailed(e.toString()),
+        e,
+      );
     }
   }
 
@@ -30,7 +34,10 @@ class SecureStorageDatasource {
     try {
       return await _storage.read(key: _passwordKey(hostId));
     } catch (e) {
-      throw StorageException('Falha ao recuperar senha do cofre seguro: $e', e);
+      throw StorageException(
+        systemLocalizations.readPasswordFailed(e.toString()),
+        e,
+      );
     }
   }
 
@@ -38,7 +45,10 @@ class SecureStorageDatasource {
     try {
       await _storage.delete(key: _passwordKey(hostId));
     } catch (e) {
-      throw StorageException('Falha ao deletar senha do cofre seguro: $e', e);
+      throw StorageException(
+        systemLocalizations.deletePasswordFailed(e.toString()),
+        e,
+      );
     }
   }
 
@@ -47,7 +57,7 @@ class SecureStorageDatasource {
       await _storage.write(key: _passphraseKey(hostId), value: passphrase);
     } catch (e) {
       throw StorageException(
-        'Falha ao salvar passphrase no cofre seguro: $e',
+        systemLocalizations.savePassphraseFailed(e.toString()),
         e,
       );
     }
@@ -58,7 +68,7 @@ class SecureStorageDatasource {
       return await _storage.read(key: _passphraseKey(hostId));
     } catch (e) {
       throw StorageException(
-        'Falha ao recuperar passphrase do cofre seguro: $e',
+        systemLocalizations.readPassphraseFailed(e.toString()),
         e,
       );
     }
@@ -69,7 +79,7 @@ class SecureStorageDatasource {
       await _storage.delete(key: _passphraseKey(hostId));
     } catch (e) {
       throw StorageException(
-        'Falha ao deletar passphrase do cofre seguro: $e',
+        systemLocalizations.deletePassphraseFailed(e.toString()),
         e,
       );
     }
