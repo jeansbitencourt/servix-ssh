@@ -8,6 +8,9 @@ import '../../core/theme/app_theme.dart';
 import '../stores/host_store.dart';
 import '../stores/shortcut_store.dart';
 import '../stores/terminal_session_store.dart';
+import '../stores/tunnel_store.dart';
+import '../widgets/tunnel_icon.dart';
+import 'tunnels_view.dart';
 import 'dashboard_view.dart';
 import 'hosts_view.dart';
 import 'shortcuts_view.dart';
@@ -27,6 +30,8 @@ class _MainLayoutState extends State<MainLayout> {
   final HostStore _hostStore = sl<HostStore>();
   final ShortcutStore _shortcutStore = sl<ShortcutStore>();
   final TerminalSessionStore _terminalStore = sl<TerminalSessionStore>();
+
+  final TunnelStore _tunnelStore = sl<TunnelStore>();
 
   void _onTabSelect(int index) {
     setState(() {
@@ -76,14 +81,14 @@ class _MainLayoutState extends State<MainLayout> {
                           _buildNavItem(
                             index: 0,
                             compact: compact,
-                            icon: Icons.dashboard_rounded,
+                            icon: const Icon(Icons.dashboard_rounded),
                             label: l10n.dashboard,
                           ),
                           const SizedBox(height: 4),
                           _buildNavItem(
                             index: 1,
                             compact: compact,
-                            icon: Icons.dns_rounded,
+                            icon: const Icon(Icons.dns_rounded),
                             label: l10n.servers,
                             badge: hostCount > 0 ? hostCount.toString() : null,
                           ),
@@ -91,19 +96,26 @@ class _MainLayoutState extends State<MainLayout> {
                           _buildNavItem(
                             index: 2,
                             compact: compact,
-                            icon: Icons.flash_on_rounded,
+                            icon: const Icon(Icons.flash_on_rounded),
                             label: l10n.shortcuts,
                           ),
                           const SizedBox(height: 4),
                           _buildNavItem(
                             index: 3,
                             compact: compact,
-                            icon: Icons.terminal_rounded,
+                            icon: const Icon(Icons.terminal_rounded),
                             label: l10n.terminals,
                             badge: activeTerminalCount > 0
                                 ? activeTerminalCount.toString()
                                 : null,
                             badgeColor: AppTheme.accent,
+                          ),
+                          const SizedBox(height: 4),
+                          _buildNavItem(
+                            index: 4,
+                            compact: compact,
+                            icon: const TunnelIcon(),
+                            label: l10n.tunnels,
                           ),
                         ],
                       ),
@@ -203,6 +215,11 @@ class _MainLayoutState extends State<MainLayout> {
                       terminalStore: _terminalStore,
                       hostStore: _hostStore,
                     ),
+                    TunnelsView(
+                      store: _tunnelStore,
+                      hostStore: _hostStore,
+                      onOpenServers: () => _onTabSelect(1),
+                    ),
                   ],
                 ),
               ),
@@ -268,17 +285,19 @@ class _MainLayoutState extends State<MainLayout> {
   Widget _buildNavItem({
     required int index,
     required bool compact,
-    required IconData icon,
+    required Widget icon,
     required String label,
     String? badge,
     Color? badgeColor,
   }) {
     final isSelected = _currentIndex == index;
 
-    final navIcon = Icon(
-      icon,
-      size: 20,
-      color: isSelected ? AppTheme.accent : const Color(0xFF94A3B8),
+    final navIcon = IconTheme.merge(
+      data: IconThemeData(
+        size: 20,
+        color: isSelected ? AppTheme.accent : const Color(0xFF94A3B8),
+      ),
+      child: icon,
     );
 
     return Tooltip(

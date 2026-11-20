@@ -52,8 +52,47 @@ class ExecutionHistoryTable extends Table {
   Set<Column> get primaryKey => {id};
 }
 
+@DataClassName('TrustedHostKeyEntry')
+class TrustedHostKeysTable extends Table {
+  TextColumn get hostname => text()();
+  IntColumn get port => integer()();
+  TextColumn get algorithm => text()();
+  TextColumn get fingerprint => text()();
+  DateTimeColumn get firstConfirmedAt => dateTime()();
+  DateTimeColumn get lastVerifiedAt => dateTime()();
+
+  @override
+  Set<Column> get primaryKey => {hostname, port};
+}
+
+@DataClassName('TunnelEntry')
+class TunnelsTable extends Table {
+  TextColumn get id => text()();
+  TextColumn get name => text()();
+  TextColumn get hostId =>
+      text().references(HostsTable, #id, onDelete: KeyAction.restrict)();
+  TextColumn get localHost => text().withDefault(const Constant('127.0.0.1'))();
+  IntColumn get localPort => integer()();
+  TextColumn get remoteHost => text()();
+  IntColumn get remotePort => integer()();
+  BoolColumn get autoReconnect =>
+      boolean().withDefault(const Constant(false))();
+  BoolColumn get autoConnect => boolean().withDefault(const Constant(false))();
+  DateTimeColumn get createdAt => dateTime()();
+  DateTimeColumn get updatedAt => dateTime()();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}
+
 @DriftDatabase(
-  tables: [HostsTable, ShortcutCommandsTable, ExecutionHistoryTable],
+  tables: [
+    HostsTable,
+    ShortcutCommandsTable,
+    ExecutionHistoryTable,
+    TrustedHostKeysTable,
+    TunnelsTable,
+  ],
 )
 class AppDatabase extends _$AppDatabase {
   AppDatabase([QueryExecutor? e])
@@ -68,5 +107,18 @@ class AppDatabase extends _$AppDatabase {
       );
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
+
+  @override
+  MigrationStrategy get migration => MigrationStrategy(
+    onUpgrade: (migrator, from, to) async {
+      if (from < 2) {
+        await transaction(() async {
+          await migrator.createTable(trustedHostKeysTable);
+          await migrator.createTable(tunnelsTable);
+        });
+      }
+    },
+    beforeOpen: (_) => customStatement('PRAGMA foreign_keys = ON'),
+  );
 }

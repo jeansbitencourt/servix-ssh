@@ -7,6 +7,7 @@ import '../../domain/entities/terminal_session.dart';
 import '../../l10n/app_localizations.dart';
 import '../stores/host_store.dart';
 import '../stores/terminal_session_store.dart';
+import '../widgets/operation_empty_state.dart';
 import '../widgets/terminal_tab_view.dart';
 
 class TerminalViewScreen extends StatelessWidget {
@@ -31,48 +32,14 @@ class TerminalViewScreen extends StatelessWidget {
         final hosts = hostStore.hosts.value;
 
         if (sessions.isEmpty) {
-          return Center(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(24),
-                    decoration: BoxDecoration(
-                      color: AppTheme.darkSurfaceCard,
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: AppTheme.darkBorder),
-                    ),
-                    child: const Icon(
-                      Icons.terminal_rounded,
-                      size: 64,
-                      color: AppTheme.accent,
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                  Text(
-                    l10n.noOpenTerminals,
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    l10n.openTerminalDescription,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 14, color: Color(0xFF94A3B8)),
-                  ),
-                  const SizedBox(height: 20),
-                  ElevatedButton.icon(
-                    onPressed: () => _showOpenSessionDialog(context, hosts),
-                    icon: const Icon(Icons.add, size: 18),
-                    label: Text(l10n.startSshSession),
-                  ),
-                ],
-              ),
+          return OperationEmptyState(
+            icon: const Icon(Icons.terminal_rounded),
+            title: l10n.noOpenTerminals,
+            description: l10n.openTerminalDescription,
+            action: ElevatedButton.icon(
+              onPressed: () => _showOpenSessionDialog(context, hosts),
+              icon: const Icon(Icons.add, size: 18),
+              label: Text(l10n.startSshSession),
             ),
           );
         }

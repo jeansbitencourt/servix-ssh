@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:dartssh2/dartssh2.dart';
@@ -13,80 +12,15 @@ import '../../domain/entities/ssh_host.dart';
 import '../../domain/entities/terminal_session.dart';
 import '../../l10n/system_localizations.dart';
 
+import 'ssh_connection_factory.dart';
+
 class SSHRemoteDatasource {
   final Uuid _uuid;
 
-  SSHRemoteDatasource({Uuid? uuid}) : _uuid = uuid ?? const Uuid();
+  final SSHConnectionFactory _connections;
 
-  Future<SSHClient> _connectClient(
-    SSHHost host, {
-    String? password,
-    String? passphrase,
-    Duration timeout = const Duration(seconds: 15),
-  }) async {
-    try {
-      final socket = await SSHSocket.connect(
-        host.host,
-        host.port,
-        timeout: timeout,
-      );
-
-      List<SSHKeyPair>? identities;
-      if (host.authType == SSHAuthType.privateKey) {
-        if (host.keyFilePath == null || host.keyFilePath!.trim().isEmpty) {
-          throw SSHAuthenticationException(systemLocalizations.missingKeyPath);
-        }
-
-        final keyFile = File(host.keyFilePath!);
-        if (!keyFile.existsSync()) {
-          throw SSHAuthenticationException(
-            systemLocalizations.privateKeyNotFound(keyFile.path),
-          );
-        }
-
-        final keyPem = await keyFile.readAsString();
-        try {
-          identities = SSHKeyPair.fromPem(keyPem, passphrase);
-        } catch (e) {
-          throw SSHAuthenticationException(
-            systemLocalizations.privateKeyReadFailed(e.toString()),
-            e,
-          );
-        }
-      }
-
-      final client = SSHClient(
-        socket,
-        username: host.username,
-        onPasswordRequest: host.authType == SSHAuthType.password
-            ? () => password ?? ''
-            : null,
-        identities: identities,
-      );
-
-      await client.authenticated;
-      return client;
-    } on SocketException catch (e) {
-      throw SSHConnectionException(
-        systemLocalizations.sshSocketFailed(
-          '${host.host}:${host.port}',
-          e.message,
-        ),
-        e,
-      );
-    } on TimeoutException catch (e) {
-      throw SSHConnectionException(
-        systemLocalizations.sshConnectionTimedOut('${host.host}:${host.port}'),
-        e,
-      );
-    } catch (e) {
-      if (e is AppException) rethrow;
-      throw SSHConnectionException(
-        systemLocalizations.sshConnectionError(host.host, e.toString()),
-        e,
-      );
-    }
-  }
+  SSHRemoteDatasource(this._connections, {Uuid? uuid})
+    : _uuid = uuid ?? const Uuid();
 
   Future<bool> testConnection(
     SSHHost host, {
@@ -95,7 +29,7 @@ class SSHRemoteDatasource {
   }) async {
     SSHClient? client;
     try {
-      client = await _connectClient(
+      client = await _connections.connect(
         host,
         password: password,
         passphrase: passphrase,
@@ -103,9 +37,7 @@ class SSHRemoteDatasource {
       );
       return true;
     } finally {
-      try {
-        client?.close();
-      } catch (_) {}
+      if (client != null) await closeSSHClient(client);
     }
   }
 
@@ -121,7 +53,7 @@ class SSHRemoteDatasource {
     final stopwatch = Stopwatch()..start();
 
     try {
-      client = await _connectClient(
+      client = await _connections.connect(
         host,
         password: password,
         passphrase: passphrase,
@@ -174,9 +106,7 @@ class SSHRemoteDatasource {
         details: e,
       );
     } finally {
-      try {
-        client?.close();
-      } catch (_) {}
+      if (client != null) await closeSSHClient(client);
     }
   }
 
@@ -202,7 +132,7 @@ class SSHRemoteDatasource {
         '${systemLocalizations.terminalConnectingTo('${host.username}@${host.host}:${host.port}')}\r\n',
       );
 
-      final client = await _connectClient(
+      final client = await _connections.connect(
         host,
         password: password,
         passphrase: passphrase,
@@ -211,13 +141,15 @@ class SSHRemoteDatasource {
 
       session.client = client;
 
-      final sshSession = await client.shell(
-        pty: SSHPtyConfig(
-          width: terminal.viewWidth > 0 ? terminal.viewWidth : 80,
-          height: terminal.viewHeight > 0 ? terminal.viewHeight : 24,
-          type: 'xterm-256color',
-        ),
-      );
+      final sshSession = await client
+          .shell(
+            pty: SSHPtyConfig(
+              width: terminal.viewWidth > 0 ? terminal.viewWidth : 80,
+              height: terminal.viewHeight > 0 ? terminal.viewHeight : 24,
+              type: 'xterm-256color',
+            ),
+          )
+          .timeout(const Duration(seconds: 15));
 
       session.sshSession = sshSession;
       session.status = TerminalSessionStatus.connected;
@@ -257,16 +189,15 @@ class SSHRemoteDatasource {
 
       // Handle termination
       sshSession.done
-          .then((_) {
+          .then((_) async {
             session.status = TerminalSessionStatus.disconnected;
             terminal.write(
               '\r\n\x1b[33m${systemLocalizations.remoteSessionClosed}\x1b[0m\r\n',
             );
-            try {
-              client.close();
-            } catch (_) {}
+            await closeSSHClient(client);
           })
-          .catchError((err) {
+          .catchError((err) async {
+            await closeSSHClient(client);
             session.status = TerminalSessionStatus.error;
             session.errorMessage = err.toString();
             terminal.write(
@@ -276,6 +207,8 @@ class SSHRemoteDatasource {
 
       return session;
     } catch (e) {
+      final client = session.client;
+      if (client != null) await closeSSHClient(client);
       session.status = TerminalSessionStatus.error;
       session.errorMessage = e.toString();
       terminal.write(

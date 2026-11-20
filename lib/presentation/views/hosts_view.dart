@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 
+import '../../core/errors/exceptions.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/utils/date_formatter.dart';
 import '../../domain/entities/ssh_host.dart';
@@ -754,9 +755,18 @@ class _HostsViewState extends State<HostsView> {
             child: Text(l10n.cancel),
           ),
           ElevatedButton(
-            onPressed: () {
+            onPressed: () async {
               Navigator.pop(ctx);
-              hostStore.deleteHost(host.id);
+              try {
+                await hostStore.deleteHost(host.id);
+              } catch (error) {
+                if (!context.mounted) return;
+                final message = error is AppException
+                    ? error.message
+                    : l10n.serverDeleteError;
+                ScaffoldMessenger.of(context)
+                    .showSnackBar(SnackBar(content: Text(message)));
+              }
             },
             style: ElevatedButton.styleFrom(backgroundColor: AppTheme.error),
             child: Text(l10n.delete),

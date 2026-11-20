@@ -376,5 +376,96 @@
         "type": "String"
       }
     }
-  }
+  },
+  "tunnels": "Tunnels",
+  "tunnelNew": "New tunnel",
+  "tunnelEdit": "Edit tunnel",
+  "tunnelFormDescription": "Choose the SSH server, local port, and remote destination.",
+  "tunnelCreate": "Create tunnel",
+  "tunnelName": "Tunnel name",
+  "tunnelServer": "SSH server",
+  "tunnelRemoteHost": "Remote host",
+  "tunnelRemotePort": "Remote port",
+  "tunnelLocalPort": "Local port",
+  "tunnelAutoReconnect": "Reconnect automatically",
+  "tunnelAutoConnect": "Connect at startup",
+  "tunnelStart": "Start tunnel",
+  "tunnelStop": "Stop tunnel",
+  "tunnelCopy": "Copy local address",
+  "tunnelCopied": "Local address copied.",
+  "tunnelEmpty": "No SSH tunnels configured",
+  "tunnelEmptyDescription": "Forward a local port through an SSH server to reach a private service.",
+  "tunnelAddServer": "Add an SSH server before creating a tunnel.",
+  "tunnelLoadError": "Could not load tunnels.",
+  "tunnelSaveError": "Could not save the tunnel.",
+  "tunnelDeleteError": "Could not delete the tunnel.",
+  "tunnelDeleteTitle": "Delete tunnel",
+  "tunnelDeleteBody": "Delete “{name}”? Any active connections will close.",
+  "@tunnelDeleteBody": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "tunnelDisconnected": "Disconnected",
+  "tunnelConnecting": "Connecting",
+  "tunnelConnected": "Listening locally",
+  "tunnelDisconnecting": "Disconnecting",
+  "tunnelReconnecting": "Reconnecting",
+  "tunnelError": "Error",
+  "tunnelConnections": "{count, plural, =0{No active TCP connections} =1{1 active TCP connection} other{{count} active TCP connections}}",
+  "@tunnelConnections": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "tunnelNameRequired": "Enter a name.",
+  "tunnelPortInvalid": "Enter a port from 1 to 65535.",
+  "tunnelInvalidConfiguration": "Check the tunnel configuration.",
+  "tunnelMissingServer": "Select a registered SSH server.",
+  "tunnelInvalidTarget": "Enter a hostname or IP address.",
+  "tunnelPortInUse": "Local port {port} is already in use.",
+  "@tunnelPortInUse": {
+    "placeholders": {
+      "port": {
+        "type": "int"
+      }
+    }
+  },
+  "tunnelListenerError": "The local listener could not be opened or was interrupted.",
+  "tunnelForwardingRefused": "The SSH server refused TCP forwarding. Check its forwarding policy.",
+  "tunnelDestinationUnavailable": "The SSH server could not reach the remote destination.",
+  "tunnelTransferError": "A TCP connection could not be handled.",
+  "tunnelUnexpectedDisconnect": "The SSH connection dropped unexpectedly.",
+  "stopTunnelBeforeEditing": "Stop the tunnel before editing it.",
+  "hostUsedByTunnel": "Delete or move this server’s tunnels before deleting the server.",
+  "serverDeleteError": "Could not delete the server.",
+  "sshServerUnavailable": "Could not connect to SSH server {address}.",
+  "@sshServerUnavailable": {
+    "placeholders": {
+      "address": {
+        "type": "String"
+      }
+    }
+  },
+  "sshAuthenticationFailed": "SSH authentication failed. Check your credentials.",
+  "sshCredentialsUnavailable": "Could not access credentials in the system vault.",
+  "sshPrivateKeyInvalid": "Could not read the private key. Check the file and passphrase.",
+  "hostKeyUnknownTitle": "Unknown SSH host key",
+  "hostKeyUnknownBody": "This server’s identity has not been verified. Compare the fingerprint with one obtained from a trusted source before accepting it.",
+  "hostKeyTrust": "Trust this key",
+  "hostKeyRejected": "Connection blocked because the SSH host key was not verified.",
+  "hostKeyStorageError": "The trusted host key could not be read or saved. The connection is blocked. Retry to check the current identity.",
+  "hostKeyChangedTitle": "Security alert: SSH host key changed",
+  "hostKeyChangedError": "Connection blocked because the SSH host key changed.",
+  "hostKeyChangedBody": "Servix blocked this connection. A server key change can indicate interception. Verify the new fingerprint with the server administrator through a trusted channel.",
+  "hostKeyPrevious": "Previously trusted identity",
+  "hostKeyPresented": "Presented identity",
+  "hostKeyReview": "Review replacement",
+  "hostKeyReplace": "Replace trusted key",
+  "hostKeyReplaceBody": "Replace the trusted key only after independently verifying the new fingerprint. Future connections will use the identity below.",
+  "hostKeyReplaced": "Trusted key replaced. Start a new connection to use it."
 }

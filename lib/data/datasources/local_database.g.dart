@@ -1688,6 +1688,1113 @@ class ExecutionHistoryTableCompanion
   }
 }
 
+class $TrustedHostKeysTableTable extends TrustedHostKeysTable
+    with TableInfo<$TrustedHostKeysTableTable, TrustedHostKeyEntry> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $TrustedHostKeysTableTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _hostnameMeta = const VerificationMeta(
+    'hostname',
+  );
+  @override
+  late final GeneratedColumn<String> hostname = GeneratedColumn<String>(
+    'hostname',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _portMeta = const VerificationMeta('port');
+  @override
+  late final GeneratedColumn<int> port = GeneratedColumn<int>(
+    'port',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _algorithmMeta = const VerificationMeta(
+    'algorithm',
+  );
+  @override
+  late final GeneratedColumn<String> algorithm = GeneratedColumn<String>(
+    'algorithm',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _fingerprintMeta = const VerificationMeta(
+    'fingerprint',
+  );
+  @override
+  late final GeneratedColumn<String> fingerprint = GeneratedColumn<String>(
+    'fingerprint',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _firstConfirmedAtMeta = const VerificationMeta(
+    'firstConfirmedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> firstConfirmedAt =
+      GeneratedColumn<DateTime>(
+        'first_confirmed_at',
+        aliasedName,
+        false,
+        type: DriftSqlType.dateTime,
+        requiredDuringInsert: true,
+      );
+  static const VerificationMeta _lastVerifiedAtMeta = const VerificationMeta(
+    'lastVerifiedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> lastVerifiedAt =
+      GeneratedColumn<DateTime>(
+        'last_verified_at',
+        aliasedName,
+        false,
+        type: DriftSqlType.dateTime,
+        requiredDuringInsert: true,
+      );
+  @override
+  List<GeneratedColumn> get $columns => [
+    hostname,
+    port,
+    algorithm,
+    fingerprint,
+    firstConfirmedAt,
+    lastVerifiedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'trusted_host_keys_table';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<TrustedHostKeyEntry> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('hostname')) {
+      context.handle(
+        _hostnameMeta,
+        hostname.isAcceptableOrUnknown(data['hostname']!, _hostnameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_hostnameMeta);
+    }
+    if (data.containsKey('port')) {
+      context.handle(
+        _portMeta,
+        port.isAcceptableOrUnknown(data['port']!, _portMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_portMeta);
+    }
+    if (data.containsKey('algorithm')) {
+      context.handle(
+        _algorithmMeta,
+        algorithm.isAcceptableOrUnknown(data['algorithm']!, _algorithmMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_algorithmMeta);
+    }
+    if (data.containsKey('fingerprint')) {
+      context.handle(
+        _fingerprintMeta,
+        fingerprint.isAcceptableOrUnknown(
+          data['fingerprint']!,
+          _fingerprintMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_fingerprintMeta);
+    }
+    if (data.containsKey('first_confirmed_at')) {
+      context.handle(
+        _firstConfirmedAtMeta,
+        firstConfirmedAt.isAcceptableOrUnknown(
+          data['first_confirmed_at']!,
+          _firstConfirmedAtMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_firstConfirmedAtMeta);
+    }
+    if (data.containsKey('last_verified_at')) {
+      context.handle(
+        _lastVerifiedAtMeta,
+        lastVerifiedAt.isAcceptableOrUnknown(
+          data['last_verified_at']!,
+          _lastVerifiedAtMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_lastVerifiedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {hostname, port};
+  @override
+  TrustedHostKeyEntry map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return TrustedHostKeyEntry(
+      hostname: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}hostname'],
+      )!,
+      port: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}port'],
+      )!,
+      algorithm: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}algorithm'],
+      )!,
+      fingerprint: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}fingerprint'],
+      )!,
+      firstConfirmedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}first_confirmed_at'],
+      )!,
+      lastVerifiedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}last_verified_at'],
+      )!,
+    );
+  }
+
+  @override
+  $TrustedHostKeysTableTable createAlias(String alias) {
+    return $TrustedHostKeysTableTable(attachedDatabase, alias);
+  }
+}
+
+class TrustedHostKeyEntry extends DataClass
+    implements Insertable<TrustedHostKeyEntry> {
+  final String hostname;
+  final int port;
+  final String algorithm;
+  final String fingerprint;
+  final DateTime firstConfirmedAt;
+  final DateTime lastVerifiedAt;
+  const TrustedHostKeyEntry({
+    required this.hostname,
+    required this.port,
+    required this.algorithm,
+    required this.fingerprint,
+    required this.firstConfirmedAt,
+    required this.lastVerifiedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['hostname'] = Variable<String>(hostname);
+    map['port'] = Variable<int>(port);
+    map['algorithm'] = Variable<String>(algorithm);
+    map['fingerprint'] = Variable<String>(fingerprint);
+    map['first_confirmed_at'] = Variable<DateTime>(firstConfirmedAt);
+    map['last_verified_at'] = Variable<DateTime>(lastVerifiedAt);
+    return map;
+  }
+
+  TrustedHostKeysTableCompanion toCompanion(bool nullToAbsent) {
+    return TrustedHostKeysTableCompanion(
+      hostname: Value(hostname),
+      port: Value(port),
+      algorithm: Value(algorithm),
+      fingerprint: Value(fingerprint),
+      firstConfirmedAt: Value(firstConfirmedAt),
+      lastVerifiedAt: Value(lastVerifiedAt),
+    );
+  }
+
+  factory TrustedHostKeyEntry.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return TrustedHostKeyEntry(
+      hostname: serializer.fromJson<String>(json['hostname']),
+      port: serializer.fromJson<int>(json['port']),
+      algorithm: serializer.fromJson<String>(json['algorithm']),
+      fingerprint: serializer.fromJson<String>(json['fingerprint']),
+      firstConfirmedAt: serializer.fromJson<DateTime>(json['firstConfirmedAt']),
+      lastVerifiedAt: serializer.fromJson<DateTime>(json['lastVerifiedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'hostname': serializer.toJson<String>(hostname),
+      'port': serializer.toJson<int>(port),
+      'algorithm': serializer.toJson<String>(algorithm),
+      'fingerprint': serializer.toJson<String>(fingerprint),
+      'firstConfirmedAt': serializer.toJson<DateTime>(firstConfirmedAt),
+      'lastVerifiedAt': serializer.toJson<DateTime>(lastVerifiedAt),
+    };
+  }
+
+  TrustedHostKeyEntry copyWith({
+    String? hostname,
+    int? port,
+    String? algorithm,
+    String? fingerprint,
+    DateTime? firstConfirmedAt,
+    DateTime? lastVerifiedAt,
+  }) => TrustedHostKeyEntry(
+    hostname: hostname ?? this.hostname,
+    port: port ?? this.port,
+    algorithm: algorithm ?? this.algorithm,
+    fingerprint: fingerprint ?? this.fingerprint,
+    firstConfirmedAt: firstConfirmedAt ?? this.firstConfirmedAt,
+    lastVerifiedAt: lastVerifiedAt ?? this.lastVerifiedAt,
+  );
+  TrustedHostKeyEntry copyWithCompanion(TrustedHostKeysTableCompanion data) {
+    return TrustedHostKeyEntry(
+      hostname: data.hostname.present ? data.hostname.value : this.hostname,
+      port: data.port.present ? data.port.value : this.port,
+      algorithm: data.algorithm.present ? data.algorithm.value : this.algorithm,
+      fingerprint: data.fingerprint.present
+          ? data.fingerprint.value
+          : this.fingerprint,
+      firstConfirmedAt: data.firstConfirmedAt.present
+          ? data.firstConfirmedAt.value
+          : this.firstConfirmedAt,
+      lastVerifiedAt: data.lastVerifiedAt.present
+          ? data.lastVerifiedAt.value
+          : this.lastVerifiedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('TrustedHostKeyEntry(')
+          ..write('hostname: $hostname, ')
+          ..write('port: $port, ')
+          ..write('algorithm: $algorithm, ')
+          ..write('fingerprint: $fingerprint, ')
+          ..write('firstConfirmedAt: $firstConfirmedAt, ')
+          ..write('lastVerifiedAt: $lastVerifiedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    hostname,
+    port,
+    algorithm,
+    fingerprint,
+    firstConfirmedAt,
+    lastVerifiedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is TrustedHostKeyEntry &&
+          other.hostname == this.hostname &&
+          other.port == this.port &&
+          other.algorithm == this.algorithm &&
+          other.fingerprint == this.fingerprint &&
+          other.firstConfirmedAt == this.firstConfirmedAt &&
+          other.lastVerifiedAt == this.lastVerifiedAt);
+}
+
+class TrustedHostKeysTableCompanion
+    extends UpdateCompanion<TrustedHostKeyEntry> {
+  final Value<String> hostname;
+  final Value<int> port;
+  final Value<String> algorithm;
+  final Value<String> fingerprint;
+  final Value<DateTime> firstConfirmedAt;
+  final Value<DateTime> lastVerifiedAt;
+  final Value<int> rowid;
+  const TrustedHostKeysTableCompanion({
+    this.hostname = const Value.absent(),
+    this.port = const Value.absent(),
+    this.algorithm = const Value.absent(),
+    this.fingerprint = const Value.absent(),
+    this.firstConfirmedAt = const Value.absent(),
+    this.lastVerifiedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  TrustedHostKeysTableCompanion.insert({
+    required String hostname,
+    required int port,
+    required String algorithm,
+    required String fingerprint,
+    required DateTime firstConfirmedAt,
+    required DateTime lastVerifiedAt,
+    this.rowid = const Value.absent(),
+  }) : hostname = Value(hostname),
+       port = Value(port),
+       algorithm = Value(algorithm),
+       fingerprint = Value(fingerprint),
+       firstConfirmedAt = Value(firstConfirmedAt),
+       lastVerifiedAt = Value(lastVerifiedAt);
+  static Insertable<TrustedHostKeyEntry> custom({
+    Expression<String>? hostname,
+    Expression<int>? port,
+    Expression<String>? algorithm,
+    Expression<String>? fingerprint,
+    Expression<DateTime>? firstConfirmedAt,
+    Expression<DateTime>? lastVerifiedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (hostname != null) 'hostname': hostname,
+      if (port != null) 'port': port,
+      if (algorithm != null) 'algorithm': algorithm,
+      if (fingerprint != null) 'fingerprint': fingerprint,
+      if (firstConfirmedAt != null) 'first_confirmed_at': firstConfirmedAt,
+      if (lastVerifiedAt != null) 'last_verified_at': lastVerifiedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  TrustedHostKeysTableCompanion copyWith({
+    Value<String>? hostname,
+    Value<int>? port,
+    Value<String>? algorithm,
+    Value<String>? fingerprint,
+    Value<DateTime>? firstConfirmedAt,
+    Value<DateTime>? lastVerifiedAt,
+    Value<int>? rowid,
+  }) {
+    return TrustedHostKeysTableCompanion(
+      hostname: hostname ?? this.hostname,
+      port: port ?? this.port,
+      algorithm: algorithm ?? this.algorithm,
+      fingerprint: fingerprint ?? this.fingerprint,
+      firstConfirmedAt: firstConfirmedAt ?? this.firstConfirmedAt,
+      lastVerifiedAt: lastVerifiedAt ?? this.lastVerifiedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (hostname.present) {
+      map['hostname'] = Variable<String>(hostname.value);
+    }
+    if (port.present) {
+      map['port'] = Variable<int>(port.value);
+    }
+    if (algorithm.present) {
+      map['algorithm'] = Variable<String>(algorithm.value);
+    }
+    if (fingerprint.present) {
+      map['fingerprint'] = Variable<String>(fingerprint.value);
+    }
+    if (firstConfirmedAt.present) {
+      map['first_confirmed_at'] = Variable<DateTime>(firstConfirmedAt.value);
+    }
+    if (lastVerifiedAt.present) {
+      map['last_verified_at'] = Variable<DateTime>(lastVerifiedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('TrustedHostKeysTableCompanion(')
+          ..write('hostname: $hostname, ')
+          ..write('port: $port, ')
+          ..write('algorithm: $algorithm, ')
+          ..write('fingerprint: $fingerprint, ')
+          ..write('firstConfirmedAt: $firstConfirmedAt, ')
+          ..write('lastVerifiedAt: $lastVerifiedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $TunnelsTableTable extends TunnelsTable
+    with TableInfo<$TunnelsTableTable, TunnelEntry> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $TunnelsTableTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _hostIdMeta = const VerificationMeta('hostId');
+  @override
+  late final GeneratedColumn<String> hostId = GeneratedColumn<String>(
+    'host_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES hosts_table (id) ON DELETE RESTRICT',
+    ),
+  );
+  static const VerificationMeta _localHostMeta = const VerificationMeta(
+    'localHost',
+  );
+  @override
+  late final GeneratedColumn<String> localHost = GeneratedColumn<String>(
+    'local_host',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('127.0.0.1'),
+  );
+  static const VerificationMeta _localPortMeta = const VerificationMeta(
+    'localPort',
+  );
+  @override
+  late final GeneratedColumn<int> localPort = GeneratedColumn<int>(
+    'local_port',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _remoteHostMeta = const VerificationMeta(
+    'remoteHost',
+  );
+  @override
+  late final GeneratedColumn<String> remoteHost = GeneratedColumn<String>(
+    'remote_host',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _remotePortMeta = const VerificationMeta(
+    'remotePort',
+  );
+  @override
+  late final GeneratedColumn<int> remotePort = GeneratedColumn<int>(
+    'remote_port',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _autoReconnectMeta = const VerificationMeta(
+    'autoReconnect',
+  );
+  @override
+  late final GeneratedColumn<bool> autoReconnect = GeneratedColumn<bool>(
+    'auto_reconnect',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("auto_reconnect" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _autoConnectMeta = const VerificationMeta(
+    'autoConnect',
+  );
+  @override
+  late final GeneratedColumn<bool> autoConnect = GeneratedColumn<bool>(
+    'auto_connect',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("auto_connect" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    name,
+    hostId,
+    localHost,
+    localPort,
+    remoteHost,
+    remotePort,
+    autoReconnect,
+    autoConnect,
+    createdAt,
+    updatedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'tunnels_table';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<TunnelEntry> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('host_id')) {
+      context.handle(
+        _hostIdMeta,
+        hostId.isAcceptableOrUnknown(data['host_id']!, _hostIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_hostIdMeta);
+    }
+    if (data.containsKey('local_host')) {
+      context.handle(
+        _localHostMeta,
+        localHost.isAcceptableOrUnknown(data['local_host']!, _localHostMeta),
+      );
+    }
+    if (data.containsKey('local_port')) {
+      context.handle(
+        _localPortMeta,
+        localPort.isAcceptableOrUnknown(data['local_port']!, _localPortMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_localPortMeta);
+    }
+    if (data.containsKey('remote_host')) {
+      context.handle(
+        _remoteHostMeta,
+        remoteHost.isAcceptableOrUnknown(data['remote_host']!, _remoteHostMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_remoteHostMeta);
+    }
+    if (data.containsKey('remote_port')) {
+      context.handle(
+        _remotePortMeta,
+        remotePort.isAcceptableOrUnknown(data['remote_port']!, _remotePortMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_remotePortMeta);
+    }
+    if (data.containsKey('auto_reconnect')) {
+      context.handle(
+        _autoReconnectMeta,
+        autoReconnect.isAcceptableOrUnknown(
+          data['auto_reconnect']!,
+          _autoReconnectMeta,
+        ),
+      );
+    }
+    if (data.containsKey('auto_connect')) {
+      context.handle(
+        _autoConnectMeta,
+        autoConnect.isAcceptableOrUnknown(
+          data['auto_connect']!,
+          _autoConnectMeta,
+        ),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  TunnelEntry map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return TunnelEntry(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+      hostId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}host_id'],
+      )!,
+      localHost: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}local_host'],
+      )!,
+      localPort: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}local_port'],
+      )!,
+      remoteHost: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}remote_host'],
+      )!,
+      remotePort: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}remote_port'],
+      )!,
+      autoReconnect: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}auto_reconnect'],
+      )!,
+      autoConnect: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}auto_connect'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+    );
+  }
+
+  @override
+  $TunnelsTableTable createAlias(String alias) {
+    return $TunnelsTableTable(attachedDatabase, alias);
+  }
+}
+
+class TunnelEntry extends DataClass implements Insertable<TunnelEntry> {
+  final String id;
+  final String name;
+  final String hostId;
+  final String localHost;
+  final int localPort;
+  final String remoteHost;
+  final int remotePort;
+  final bool autoReconnect;
+  final bool autoConnect;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  const TunnelEntry({
+    required this.id,
+    required this.name,
+    required this.hostId,
+    required this.localHost,
+    required this.localPort,
+    required this.remoteHost,
+    required this.remotePort,
+    required this.autoReconnect,
+    required this.autoConnect,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['name'] = Variable<String>(name);
+    map['host_id'] = Variable<String>(hostId);
+    map['local_host'] = Variable<String>(localHost);
+    map['local_port'] = Variable<int>(localPort);
+    map['remote_host'] = Variable<String>(remoteHost);
+    map['remote_port'] = Variable<int>(remotePort);
+    map['auto_reconnect'] = Variable<bool>(autoReconnect);
+    map['auto_connect'] = Variable<bool>(autoConnect);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    return map;
+  }
+
+  TunnelsTableCompanion toCompanion(bool nullToAbsent) {
+    return TunnelsTableCompanion(
+      id: Value(id),
+      name: Value(name),
+      hostId: Value(hostId),
+      localHost: Value(localHost),
+      localPort: Value(localPort),
+      remoteHost: Value(remoteHost),
+      remotePort: Value(remotePort),
+      autoReconnect: Value(autoReconnect),
+      autoConnect: Value(autoConnect),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory TunnelEntry.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return TunnelEntry(
+      id: serializer.fromJson<String>(json['id']),
+      name: serializer.fromJson<String>(json['name']),
+      hostId: serializer.fromJson<String>(json['hostId']),
+      localHost: serializer.fromJson<String>(json['localHost']),
+      localPort: serializer.fromJson<int>(json['localPort']),
+      remoteHost: serializer.fromJson<String>(json['remoteHost']),
+      remotePort: serializer.fromJson<int>(json['remotePort']),
+      autoReconnect: serializer.fromJson<bool>(json['autoReconnect']),
+      autoConnect: serializer.fromJson<bool>(json['autoConnect']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'name': serializer.toJson<String>(name),
+      'hostId': serializer.toJson<String>(hostId),
+      'localHost': serializer.toJson<String>(localHost),
+      'localPort': serializer.toJson<int>(localPort),
+      'remoteHost': serializer.toJson<String>(remoteHost),
+      'remotePort': serializer.toJson<int>(remotePort),
+      'autoReconnect': serializer.toJson<bool>(autoReconnect),
+      'autoConnect': serializer.toJson<bool>(autoConnect),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+    };
+  }
+
+  TunnelEntry copyWith({
+    String? id,
+    String? name,
+    String? hostId,
+    String? localHost,
+    int? localPort,
+    String? remoteHost,
+    int? remotePort,
+    bool? autoReconnect,
+    bool? autoConnect,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) => TunnelEntry(
+    id: id ?? this.id,
+    name: name ?? this.name,
+    hostId: hostId ?? this.hostId,
+    localHost: localHost ?? this.localHost,
+    localPort: localPort ?? this.localPort,
+    remoteHost: remoteHost ?? this.remoteHost,
+    remotePort: remotePort ?? this.remotePort,
+    autoReconnect: autoReconnect ?? this.autoReconnect,
+    autoConnect: autoConnect ?? this.autoConnect,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
+  TunnelEntry copyWithCompanion(TunnelsTableCompanion data) {
+    return TunnelEntry(
+      id: data.id.present ? data.id.value : this.id,
+      name: data.name.present ? data.name.value : this.name,
+      hostId: data.hostId.present ? data.hostId.value : this.hostId,
+      localHost: data.localHost.present ? data.localHost.value : this.localHost,
+      localPort: data.localPort.present ? data.localPort.value : this.localPort,
+      remoteHost: data.remoteHost.present
+          ? data.remoteHost.value
+          : this.remoteHost,
+      remotePort: data.remotePort.present
+          ? data.remotePort.value
+          : this.remotePort,
+      autoReconnect: data.autoReconnect.present
+          ? data.autoReconnect.value
+          : this.autoReconnect,
+      autoConnect: data.autoConnect.present
+          ? data.autoConnect.value
+          : this.autoConnect,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('TunnelEntry(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('hostId: $hostId, ')
+          ..write('localHost: $localHost, ')
+          ..write('localPort: $localPort, ')
+          ..write('remoteHost: $remoteHost, ')
+          ..write('remotePort: $remotePort, ')
+          ..write('autoReconnect: $autoReconnect, ')
+          ..write('autoConnect: $autoConnect, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    name,
+    hostId,
+    localHost,
+    localPort,
+    remoteHost,
+    remotePort,
+    autoReconnect,
+    autoConnect,
+    createdAt,
+    updatedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is TunnelEntry &&
+          other.id == this.id &&
+          other.name == this.name &&
+          other.hostId == this.hostId &&
+          other.localHost == this.localHost &&
+          other.localPort == this.localPort &&
+          other.remoteHost == this.remoteHost &&
+          other.remotePort == this.remotePort &&
+          other.autoReconnect == this.autoReconnect &&
+          other.autoConnect == this.autoConnect &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt);
+}
+
+class TunnelsTableCompanion extends UpdateCompanion<TunnelEntry> {
+  final Value<String> id;
+  final Value<String> name;
+  final Value<String> hostId;
+  final Value<String> localHost;
+  final Value<int> localPort;
+  final Value<String> remoteHost;
+  final Value<int> remotePort;
+  final Value<bool> autoReconnect;
+  final Value<bool> autoConnect;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  final Value<int> rowid;
+  const TunnelsTableCompanion({
+    this.id = const Value.absent(),
+    this.name = const Value.absent(),
+    this.hostId = const Value.absent(),
+    this.localHost = const Value.absent(),
+    this.localPort = const Value.absent(),
+    this.remoteHost = const Value.absent(),
+    this.remotePort = const Value.absent(),
+    this.autoReconnect = const Value.absent(),
+    this.autoConnect = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  TunnelsTableCompanion.insert({
+    required String id,
+    required String name,
+    required String hostId,
+    this.localHost = const Value.absent(),
+    required int localPort,
+    required String remoteHost,
+    required int remotePort,
+    this.autoReconnect = const Value.absent(),
+    this.autoConnect = const Value.absent(),
+    required DateTime createdAt,
+    required DateTime updatedAt,
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       name = Value(name),
+       hostId = Value(hostId),
+       localPort = Value(localPort),
+       remoteHost = Value(remoteHost),
+       remotePort = Value(remotePort),
+       createdAt = Value(createdAt),
+       updatedAt = Value(updatedAt);
+  static Insertable<TunnelEntry> custom({
+    Expression<String>? id,
+    Expression<String>? name,
+    Expression<String>? hostId,
+    Expression<String>? localHost,
+    Expression<int>? localPort,
+    Expression<String>? remoteHost,
+    Expression<int>? remotePort,
+    Expression<bool>? autoReconnect,
+    Expression<bool>? autoConnect,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (name != null) 'name': name,
+      if (hostId != null) 'host_id': hostId,
+      if (localHost != null) 'local_host': localHost,
+      if (localPort != null) 'local_port': localPort,
+      if (remoteHost != null) 'remote_host': remoteHost,
+      if (remotePort != null) 'remote_port': remotePort,
+      if (autoReconnect != null) 'auto_reconnect': autoReconnect,
+      if (autoConnect != null) 'auto_connect': autoConnect,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  TunnelsTableCompanion copyWith({
+    Value<String>? id,
+    Value<String>? name,
+    Value<String>? hostId,
+    Value<String>? localHost,
+    Value<int>? localPort,
+    Value<String>? remoteHost,
+    Value<int>? remotePort,
+    Value<bool>? autoReconnect,
+    Value<bool>? autoConnect,
+    Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
+    Value<int>? rowid,
+  }) {
+    return TunnelsTableCompanion(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      hostId: hostId ?? this.hostId,
+      localHost: localHost ?? this.localHost,
+      localPort: localPort ?? this.localPort,
+      remoteHost: remoteHost ?? this.remoteHost,
+      remotePort: remotePort ?? this.remotePort,
+      autoReconnect: autoReconnect ?? this.autoReconnect,
+      autoConnect: autoConnect ?? this.autoConnect,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (hostId.present) {
+      map['host_id'] = Variable<String>(hostId.value);
+    }
+    if (localHost.present) {
+      map['local_host'] = Variable<String>(localHost.value);
+    }
+    if (localPort.present) {
+      map['local_port'] = Variable<int>(localPort.value);
+    }
+    if (remoteHost.present) {
+      map['remote_host'] = Variable<String>(remoteHost.value);
+    }
+    if (remotePort.present) {
+      map['remote_port'] = Variable<int>(remotePort.value);
+    }
+    if (autoReconnect.present) {
+      map['auto_reconnect'] = Variable<bool>(autoReconnect.value);
+    }
+    if (autoConnect.present) {
+      map['auto_connect'] = Variable<bool>(autoConnect.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('TunnelsTableCompanion(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('hostId: $hostId, ')
+          ..write('localHost: $localHost, ')
+          ..write('localPort: $localPort, ')
+          ..write('remoteHost: $remoteHost, ')
+          ..write('remotePort: $remotePort, ')
+          ..write('autoReconnect: $autoReconnect, ')
+          ..write('autoConnect: $autoConnect, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -1696,6 +2803,9 @@ abstract class _$AppDatabase extends GeneratedDatabase {
       $ShortcutCommandsTableTable(this);
   late final $ExecutionHistoryTableTable executionHistoryTable =
       $ExecutionHistoryTableTable(this);
+  late final $TrustedHostKeysTableTable trustedHostKeysTable =
+      $TrustedHostKeysTableTable(this);
+  late final $TunnelsTableTable tunnelsTable = $TunnelsTableTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -1704,6 +2814,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     hostsTable,
     shortcutCommandsTable,
     executionHistoryTable,
+    trustedHostKeysTable,
+    tunnelsTable,
   ];
 }
 
@@ -1733,6 +2845,29 @@ typedef $$HostsTableTableUpdateCompanionBuilder = HostsTableCompanion Function({
   Value<DateTime> updatedAt,
   Value<int> rowid,
 });
+
+final class $$HostsTableTableReferences
+    extends BaseReferences<_$AppDatabase, $HostsTableTable, HostEntry> {
+  $$HostsTableTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static MultiTypedResultKey<$TunnelsTableTable, List<TunnelEntry>>
+  _tunnelsTableRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.tunnelsTable,
+    aliasName: 'hosts_table__id__tunnels_table__host_id',
+  );
+
+  $$TunnelsTableTableProcessedTableManager get tunnelsTableRefs {
+    final manager = $$TunnelsTableTableTableManager(
+      $_db,
+      $_db.tunnelsTable,
+    ).filter((f) => f.hostId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_tunnelsTableRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+}
 
 class $$HostsTableTableFilterComposer
     extends Composer<_$AppDatabase, $HostsTableTable> {
@@ -1792,6 +2927,31 @@ class $$HostsTableTableFilterComposer
     column: $table.updatedAt,
     builder: (column) => ColumnFilters(column),
   );
+
+  Expression<bool> tunnelsTableRefs(
+    Expression<bool> Function($$TunnelsTableTableFilterComposer f) f,
+  ) {
+    final $$TunnelsTableTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.tunnelsTable,
+      getReferencedColumn: (t) => t.hostId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$TunnelsTableTableFilterComposer(
+            $db: $db,
+            $table: $db.tunnelsTable,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$HostsTableTableOrderingComposer
@@ -1894,6 +3054,31 @@ class $$HostsTableTableAnnotationComposer
 
   GeneratedColumn<DateTime> get updatedAt =>
       $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  Expression<T> tunnelsTableRefs<T extends Object>(
+    Expression<T> Function($$TunnelsTableTableAnnotationComposer a) f,
+  ) {
+    final $$TunnelsTableTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.tunnelsTable,
+      getReferencedColumn: (t) => t.hostId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$TunnelsTableTableAnnotationComposer(
+            $db: $db,
+            $table: $db.tunnelsTable,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$HostsTableTableTableManager
@@ -1907,12 +3092,9 @@ class $$HostsTableTableTableManager
           $$HostsTableTableAnnotationComposer,
           $$HostsTableTableCreateCompanionBuilder,
           $$HostsTableTableUpdateCompanionBuilder,
-          (
-            HostEntry,
-            BaseReferences<_$AppDatabase, $HostsTableTable, HostEntry>,
-          ),
+          (HostEntry, $$HostsTableTableReferences),
           HostEntry,
-          PrefetchHooks Function()
+          PrefetchHooks Function({bool tunnelsTableRefs})
         > {
   $$HostsTableTableTableManager(_$AppDatabase db, $HostsTableTable table)
     : super(
@@ -1981,15 +3163,41 @@ class $$HostsTableTableTableManager
               .map(
                 (e) => (
                   e.readTable<$HostsTableTable, HostEntry>(table),
-                  BaseReferences<_$AppDatabase, $HostsTableTable, HostEntry>(
-                    db,
-                    table,
-                    e,
-                  ),
+                  $$HostsTableTableReferences(db, table, e),
                 ),
               )
               .toList(),
-          prefetchHooksCallback: null,
+          prefetchHooksCallback: ({tunnelsTableRefs = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [if (tunnelsTableRefs) db.tunnelsTable],
+              addJoins: null,
+              getPrefetchedDataCallback: (items) async {
+                return [
+                  if (tunnelsTableRefs)
+                    await $_getPrefetchedDataByColumns<
+                      HostEntry,
+                      $HostsTableTable,
+                      TunnelEntry,
+                      $TunnelsTableTable
+                    >(
+                      currentTable: table,
+                      referencedTable: $$HostsTableTableReferences
+                          ._tunnelsTableRefsTable(db),
+                      managerFromTypedResult: (p0) =>
+                          $$HostsTableTableReferences(
+                            db,
+                            table,
+                            p0,
+                          ).tunnelsTableRefs,
+                      currentColumn: 'id',
+                      referencedColumn: 'host_id',
+                      typedResults: items,
+                    ),
+                ];
+              },
+            );
+          },
         ),
       );
 }
@@ -2004,9 +3212,9 @@ typedef $$HostsTableTableProcessedTableManager =
       $$HostsTableTableAnnotationComposer,
       $$HostsTableTableCreateCompanionBuilder,
       $$HostsTableTableUpdateCompanionBuilder,
-      (HostEntry, BaseReferences<_$AppDatabase, $HostsTableTable, HostEntry>),
+      (HostEntry, $$HostsTableTableReferences),
       HostEntry,
-      PrefetchHooks Function()
+      PrefetchHooks Function({bool tunnelsTableRefs})
     >;
 typedef $$ShortcutCommandsTableTableCreateCompanionBuilder =
     ShortcutCommandsTableCompanion Function({
@@ -2612,6 +3820,695 @@ typedef $$ExecutionHistoryTableTableProcessedTableManager =
       ExecutionHistoryEntry,
       PrefetchHooks Function()
     >;
+typedef $$TrustedHostKeysTableTableCreateCompanionBuilder =
+    TrustedHostKeysTableCompanion Function({
+      required String hostname,
+      required int port,
+      required String algorithm,
+      required String fingerprint,
+      required DateTime firstConfirmedAt,
+      required DateTime lastVerifiedAt,
+      Value<int> rowid,
+    });
+typedef $$TrustedHostKeysTableTableUpdateCompanionBuilder =
+    TrustedHostKeysTableCompanion Function({
+      Value<String> hostname,
+      Value<int> port,
+      Value<String> algorithm,
+      Value<String> fingerprint,
+      Value<DateTime> firstConfirmedAt,
+      Value<DateTime> lastVerifiedAt,
+      Value<int> rowid,
+    });
+
+class $$TrustedHostKeysTableTableFilterComposer
+    extends Composer<_$AppDatabase, $TrustedHostKeysTableTable> {
+  $$TrustedHostKeysTableTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get hostname => $composableBuilder(
+    column: $table.hostname,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get port => $composableBuilder(
+    column: $table.port,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get algorithm => $composableBuilder(
+    column: $table.algorithm,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get fingerprint => $composableBuilder(
+    column: $table.fingerprint,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get firstConfirmedAt => $composableBuilder(
+    column: $table.firstConfirmedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get lastVerifiedAt => $composableBuilder(
+    column: $table.lastVerifiedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$TrustedHostKeysTableTableOrderingComposer
+    extends Composer<_$AppDatabase, $TrustedHostKeysTableTable> {
+  $$TrustedHostKeysTableTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get hostname => $composableBuilder(
+    column: $table.hostname,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get port => $composableBuilder(
+    column: $table.port,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get algorithm => $composableBuilder(
+    column: $table.algorithm,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get fingerprint => $composableBuilder(
+    column: $table.fingerprint,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get firstConfirmedAt => $composableBuilder(
+    column: $table.firstConfirmedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get lastVerifiedAt => $composableBuilder(
+    column: $table.lastVerifiedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$TrustedHostKeysTableTableAnnotationComposer
+    extends Composer<_$AppDatabase, $TrustedHostKeysTableTable> {
+  $$TrustedHostKeysTableTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get hostname =>
+      $composableBuilder(column: $table.hostname, builder: (column) => column);
+
+  GeneratedColumn<int> get port =>
+      $composableBuilder(column: $table.port, builder: (column) => column);
+
+  GeneratedColumn<String> get algorithm =>
+      $composableBuilder(column: $table.algorithm, builder: (column) => column);
+
+  GeneratedColumn<String> get fingerprint => $composableBuilder(
+    column: $table.fingerprint,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get firstConfirmedAt => $composableBuilder(
+    column: $table.firstConfirmedAt,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get lastVerifiedAt => $composableBuilder(
+    column: $table.lastVerifiedAt,
+    builder: (column) => column,
+  );
+}
+
+class $$TrustedHostKeysTableTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $TrustedHostKeysTableTable,
+          TrustedHostKeyEntry,
+          $$TrustedHostKeysTableTableFilterComposer,
+          $$TrustedHostKeysTableTableOrderingComposer,
+          $$TrustedHostKeysTableTableAnnotationComposer,
+          $$TrustedHostKeysTableTableCreateCompanionBuilder,
+          $$TrustedHostKeysTableTableUpdateCompanionBuilder,
+          (
+            TrustedHostKeyEntry,
+            BaseReferences<
+              _$AppDatabase,
+              $TrustedHostKeysTableTable,
+              TrustedHostKeyEntry
+            >,
+          ),
+          TrustedHostKeyEntry,
+          PrefetchHooks Function()
+        > {
+  $$TrustedHostKeysTableTableTableManager(
+    _$AppDatabase db,
+    $TrustedHostKeysTableTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$TrustedHostKeysTableTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$TrustedHostKeysTableTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$TrustedHostKeysTableTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> hostname = const Value.absent(),
+                Value<int> port = const Value.absent(),
+                Value<String> algorithm = const Value.absent(),
+                Value<String> fingerprint = const Value.absent(),
+                Value<DateTime> firstConfirmedAt = const Value.absent(),
+                Value<DateTime> lastVerifiedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => TrustedHostKeysTableCompanion(
+                hostname: hostname,
+                port: port,
+                algorithm: algorithm,
+                fingerprint: fingerprint,
+                firstConfirmedAt: firstConfirmedAt,
+                lastVerifiedAt: lastVerifiedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String hostname,
+                required int port,
+                required String algorithm,
+                required String fingerprint,
+                required DateTime firstConfirmedAt,
+                required DateTime lastVerifiedAt,
+                Value<int> rowid = const Value.absent(),
+              }) => TrustedHostKeysTableCompanion.insert(
+                hostname: hostname,
+                port: port,
+                algorithm: algorithm,
+                fingerprint: fingerprint,
+                firstConfirmedAt: firstConfirmedAt,
+                lastVerifiedAt: lastVerifiedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$TrustedHostKeysTableTable, TrustedHostKeyEntry>(
+                    table,
+                  ),
+                  BaseReferences<
+                    _$AppDatabase,
+                    $TrustedHostKeysTableTable,
+                    TrustedHostKeyEntry
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$TrustedHostKeysTableTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $TrustedHostKeysTableTable,
+      TrustedHostKeyEntry,
+      $$TrustedHostKeysTableTableFilterComposer,
+      $$TrustedHostKeysTableTableOrderingComposer,
+      $$TrustedHostKeysTableTableAnnotationComposer,
+      $$TrustedHostKeysTableTableCreateCompanionBuilder,
+      $$TrustedHostKeysTableTableUpdateCompanionBuilder,
+      (
+        TrustedHostKeyEntry,
+        BaseReferences<
+          _$AppDatabase,
+          $TrustedHostKeysTableTable,
+          TrustedHostKeyEntry
+        >,
+      ),
+      TrustedHostKeyEntry,
+      PrefetchHooks Function()
+    >;
+typedef $$TunnelsTableTableCreateCompanionBuilder =
+    TunnelsTableCompanion Function({
+      required String id,
+      required String name,
+      required String hostId,
+      Value<String> localHost,
+      required int localPort,
+      required String remoteHost,
+      required int remotePort,
+      Value<bool> autoReconnect,
+      Value<bool> autoConnect,
+      required DateTime createdAt,
+      required DateTime updatedAt,
+      Value<int> rowid,
+    });
+typedef $$TunnelsTableTableUpdateCompanionBuilder =
+    TunnelsTableCompanion Function({
+      Value<String> id,
+      Value<String> name,
+      Value<String> hostId,
+      Value<String> localHost,
+      Value<int> localPort,
+      Value<String> remoteHost,
+      Value<int> remotePort,
+      Value<bool> autoReconnect,
+      Value<bool> autoConnect,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+      Value<int> rowid,
+    });
+
+final class $$TunnelsTableTableReferences
+    extends BaseReferences<_$AppDatabase, $TunnelsTableTable, TunnelEntry> {
+  $$TunnelsTableTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static $HostsTableTable _hostIdTable(_$AppDatabase db) =>
+      db.hostsTable.createAlias('tunnels_table__host_id__hosts_table__id');
+
+  $$HostsTableTableProcessedTableManager get hostId {
+    final $_column = $_itemColumn<String>('host_id')!;
+
+    final manager = $$HostsTableTableTableManager(
+      $_db,
+      $_db.hostsTable,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_hostIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$TunnelsTableTableFilterComposer
+    extends Composer<_$AppDatabase, $TunnelsTableTable> {
+  $$TunnelsTableTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get localHost => $composableBuilder(
+    column: $table.localHost,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get localPort => $composableBuilder(
+    column: $table.localPort,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get remoteHost => $composableBuilder(
+    column: $table.remoteHost,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get remotePort => $composableBuilder(
+    column: $table.remotePort,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get autoReconnect => $composableBuilder(
+    column: $table.autoReconnect,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get autoConnect => $composableBuilder(
+    column: $table.autoConnect,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$HostsTableTableFilterComposer get hostId {
+    final $$HostsTableTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.hostId,
+      referencedTable: $db.hostsTable,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$HostsTableTableFilterComposer(
+            $db: $db,
+            $table: $db.hostsTable,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$TunnelsTableTableOrderingComposer
+    extends Composer<_$AppDatabase, $TunnelsTableTable> {
+  $$TunnelsTableTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get localHost => $composableBuilder(
+    column: $table.localHost,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get localPort => $composableBuilder(
+    column: $table.localPort,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get remoteHost => $composableBuilder(
+    column: $table.remoteHost,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get remotePort => $composableBuilder(
+    column: $table.remotePort,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get autoReconnect => $composableBuilder(
+    column: $table.autoReconnect,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get autoConnect => $composableBuilder(
+    column: $table.autoConnect,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$HostsTableTableOrderingComposer get hostId {
+    final $$HostsTableTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.hostId,
+      referencedTable: $db.hostsTable,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$HostsTableTableOrderingComposer(
+            $db: $db,
+            $table: $db.hostsTable,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$TunnelsTableTableAnnotationComposer
+    extends Composer<_$AppDatabase, $TunnelsTableTable> {
+  $$TunnelsTableTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<String> get localHost =>
+      $composableBuilder(column: $table.localHost, builder: (column) => column);
+
+  GeneratedColumn<int> get localPort =>
+      $composableBuilder(column: $table.localPort, builder: (column) => column);
+
+  GeneratedColumn<String> get remoteHost => $composableBuilder(
+    column: $table.remoteHost,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get remotePort => $composableBuilder(
+    column: $table.remotePort,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get autoReconnect => $composableBuilder(
+    column: $table.autoReconnect,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get autoConnect => $composableBuilder(
+    column: $table.autoConnect,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  $$HostsTableTableAnnotationComposer get hostId {
+    final $$HostsTableTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.hostId,
+      referencedTable: $db.hostsTable,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$HostsTableTableAnnotationComposer(
+            $db: $db,
+            $table: $db.hostsTable,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$TunnelsTableTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $TunnelsTableTable,
+          TunnelEntry,
+          $$TunnelsTableTableFilterComposer,
+          $$TunnelsTableTableOrderingComposer,
+          $$TunnelsTableTableAnnotationComposer,
+          $$TunnelsTableTableCreateCompanionBuilder,
+          $$TunnelsTableTableUpdateCompanionBuilder,
+          (TunnelEntry, $$TunnelsTableTableReferences),
+          TunnelEntry,
+          PrefetchHooks Function({bool hostId})
+        > {
+  $$TunnelsTableTableTableManager(_$AppDatabase db, $TunnelsTableTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$TunnelsTableTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$TunnelsTableTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$TunnelsTableTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> name = const Value.absent(),
+                Value<String> hostId = const Value.absent(),
+                Value<String> localHost = const Value.absent(),
+                Value<int> localPort = const Value.absent(),
+                Value<String> remoteHost = const Value.absent(),
+                Value<int> remotePort = const Value.absent(),
+                Value<bool> autoReconnect = const Value.absent(),
+                Value<bool> autoConnect = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => TunnelsTableCompanion(
+                id: id,
+                name: name,
+                hostId: hostId,
+                localHost: localHost,
+                localPort: localPort,
+                remoteHost: remoteHost,
+                remotePort: remotePort,
+                autoReconnect: autoReconnect,
+                autoConnect: autoConnect,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String name,
+                required String hostId,
+                Value<String> localHost = const Value.absent(),
+                required int localPort,
+                required String remoteHost,
+                required int remotePort,
+                Value<bool> autoReconnect = const Value.absent(),
+                Value<bool> autoConnect = const Value.absent(),
+                required DateTime createdAt,
+                required DateTime updatedAt,
+                Value<int> rowid = const Value.absent(),
+              }) => TunnelsTableCompanion.insert(
+                id: id,
+                name: name,
+                hostId: hostId,
+                localHost: localHost,
+                localPort: localPort,
+                remoteHost: remoteHost,
+                remotePort: remotePort,
+                autoReconnect: autoReconnect,
+                autoConnect: autoConnect,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$TunnelsTableTable, TunnelEntry>(table),
+                  $$TunnelsTableTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({hostId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (hostId) {
+                      state = state.withJoin(
+                        currentTable: table,
+                        currentColumn: table.hostId,
+                        referencedTable: $$TunnelsTableTableReferences
+                            ._hostIdTable(db),
+                        referencedColumn: $$TunnelsTableTableReferences
+                            ._hostIdTable(db)
+                            .id,
+                      ) as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$TunnelsTableTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $TunnelsTableTable,
+      TunnelEntry,
+      $$TunnelsTableTableFilterComposer,
+      $$TunnelsTableTableOrderingComposer,
+      $$TunnelsTableTableAnnotationComposer,
+      $$TunnelsTableTableCreateCompanionBuilder,
+      $$TunnelsTableTableUpdateCompanionBuilder,
+      (TunnelEntry, $$TunnelsTableTableReferences),
+      TunnelEntry,
+      PrefetchHooks Function({bool hostId})
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -2622,4 +4519,8 @@ class $AppDatabaseManager {
       $$ShortcutCommandsTableTableTableManager(_db, _db.shortcutCommandsTable);
   $$ExecutionHistoryTableTableTableManager get executionHistoryTable =>
       $$ExecutionHistoryTableTableTableManager(_db, _db.executionHistoryTable);
+  $$TrustedHostKeysTableTableTableManager get trustedHostKeysTable =>
+      $$TrustedHostKeysTableTableTableManager(_db, _db.trustedHostKeysTable);
+  $$TunnelsTableTableTableManager get tunnelsTable =>
+      $$TunnelsTableTableTableManager(_db, _db.tunnelsTable);
 }

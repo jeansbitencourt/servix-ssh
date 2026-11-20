@@ -1,3 +1,7 @@
+import 'dart:async';
+
+import 'dart:ui' show AppExitResponse;
+
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 
@@ -7,7 +11,10 @@ import 'domain/entities/shortcut_command.dart';
 import 'domain/repositories/shortcut_repository.dart';
 import 'l10n/app_localizations.dart';
 import 'l10n/system_localizations.dart';
+import 'presentation/stores/terminal_session_store.dart';
+import 'presentation/stores/tunnel_store.dart';
 import 'presentation/views/main_layout.dart';
+import 'presentation/widgets/ssh_host_key_dialogs.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -77,12 +84,53 @@ Future<void> _seedDefaultShortcuts() async {
   }
 }
 
-class ServixApp extends StatelessWidget {
+class ServixApp extends StatefulWidget {
   const ServixApp({super.key});
+
+  @override
+  State<ServixApp> createState() => _ServixAppState();
+}
+
+class _ServixAppState extends State<ServixApp> {
+  final _tunnels = sl<TunnelStore>();
+  final _terminals = sl<TerminalSessionStore>();
+  final _keyDialogs = sl<SSHHostKeyDialogs>();
+  late final AppLifecycleListener _lifecycle;
+  Future<void>? _shutdown;
+
+  @override
+  void initState() {
+    super.initState();
+    _lifecycle = AppLifecycleListener(
+      onExitRequested: () async {
+        await _closeConnections();
+        return AppExitResponse.exit;
+      },
+      onDetach: () => unawaited(_closeConnections()),
+    );
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _tunnels.init();
+    });
+  }
+
+  Future<void> _closeConnections() => _shutdown ??= _shutdownConnections();
+
+  Future<void> _shutdownConnections() async {
+    await _tunnels.shutdown();
+    _terminals.closeAll();
+  }
+
+  @override
+  void dispose() {
+    _lifecycle.dispose();
+    unawaited(_closeConnections());
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      navigatorKey: _keyDialogs.navigatorKey,
       onGenerateTitle: (context) => AppLocalizations.of(context).appTitle,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
